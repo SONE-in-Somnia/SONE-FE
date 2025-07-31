@@ -1,0 +1,118 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gajraj+One&family=Nova+Cut&family=Play:wght@400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Gajraj+One&family=Jaro:opsz@6..72&family=Nova+Cut&family=Play:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Montserrat, Helvetica, sans-serif;
+  font-weight: 600;
+  user-select: none;
+  color: #1E1E1E;
+  background: #dedede;
+}
+/* 
+@font-face {
+  font-family: "MODERNWARFARE";
+  src: url(../../public/fonts/MODERNWARFARE.ttf) format("truetype");
+  font-weight: normal;
+} */
+
+
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.pool-wheel-custom path {
+  stroke-opacity: 50%;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Glass effect: transparent background */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #563582; /* Primary color */
+  border-radius: 10px;
+  backdrop-filter: blur(10px); /* Glass effect with blur */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  border: 2px solid rgba(255, 255, 255, 0.1); /* Subtle border for glass effect */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6a439e; /* Slightly lighter shade on hover */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.gradient-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.text-stroke {
+  -webkit-text-stroke-width: 4px;
+  -webkit-text-stroke-color: transparent;
+  background-image: linear-gradient(to left, #ff5c5f, #8371e9);
+  background-clip: text;
+  -webkit-background-clip: text;
+  padding: 10px;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #9152F8 0%, #FF3538 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+@layer utilities {
+  .ellipsis {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+
+  .ellipsis::after {
+    content: "...";
+    display: inline-block;
+    animation: ellipsis 1.5s infinite;
+  }
+
+  @keyframes ellipsis {
+    0% {
+      width: 0;
+    }
+    33% {
+      width: 0.33em;
+    }
+    66% {
+      width: 0.66em;
+    }
+    100% {
+      width: 1em;
+    }
+  }
+}
