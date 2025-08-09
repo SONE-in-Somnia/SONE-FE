@@ -25,7 +25,7 @@ const NftPreview = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
         setIsAnimating(false);
       }, 1000);
-    }, 1500); // Total cycle time: 1s for animation + 0.5s pause
+    }, 2000); // Total cycle time: 1s for animation + 0.5s pause
 
     return () => {
       clearInterval(imageInterval);

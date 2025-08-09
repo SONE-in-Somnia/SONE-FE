@@ -20,8 +20,8 @@ const SomniaBlog = () => {
       try {
         const response = await fetch("/api/twitter");
         const data = await response.json();
-        if (data.data) {
-          setTweets(data.data);
+        if (data.tweets) {
+          setTweets(data.tweets);
         }
       } catch (error) {
         console.error("Failed to fetch tweets:", error);

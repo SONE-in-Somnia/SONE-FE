@@ -25,6 +25,8 @@ import { networks } from "@/config";
 import { toast } from "react-toastify";
 import { RetroButton } from "./RetroButton";
 
+import Window from "@/views/home-v2/components/Window";
+
 // This is sample data.
 const data = {
   navMain: [
@@ -119,67 +121,59 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               )}
             </div>
             {isConnected && (
-              <div className="p-2">
-                <SidebarFooter
-                  className={`rounded-xl p-4 ${
-                    isConnected && "bg-background"
-                  }`}
-                >
-                  {isConnected && (
-                    <div className="flex items-center justify-between gap-1">
-                      <span
-                        onClick={() => {
-                          if (!address) return;
-                          try {
-                            navigator.clipboard.writeText(address);
-                            toast.success("Copied to clipboard!");
-                          } catch (err) {
-                            toast.error("Failed to copy address");
-                          }
-                        }}
-                        className="cursor-pointer hover:underline"
-                      >
-                        {formatEthereumAddress(address)}
-                      </span>
-                      <span className="text-lg font-bold">
-                        {supportedTokens.length > 0
-                          ? convertWeiToEther(supportedTokens[0].balance || 0)
-                          : "0"}{" "}
-                        {networks[0].nativeCurrency.symbol}
-                      </span>
-                    </div>
-                  )}
+              <Window
+                title={formatEthereumAddress(address)}
+                className="!h-[200px]"
+                onTitleClick={() => {
+                  if (!address) return;
+                  try {
+                    navigator.clipboard.writeText(address);
+                    toast.success("Copied to clipboard!");
+                  } catch (err) {
+                    toast.error("Failed to copy address");
+                  }
+                }}
+              >
+                {isConnected && (
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-2xl font-bold">
+                      {supportedTokens.length > 0
+                        ? convertWeiToEther(supportedTokens[0].balance || 0)
+                        : "0"}{" "}
+                      {networks[0].nativeCurrency.symbol}
+                    </span>
+                  </div>
+                )}
 
-                  {isConnected && !isSyncMessage && (
-                    <div className="flex gap-2">
-                      <Button
-                        className="flex-1 rounded-lg bg-gradient-to-r from-[#E83C61] to-[#9950E9] text-white"
-                        onClick={() => signMessageWithSign()}
-                      >
-                        Verify Wallet
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="bg-red-500 text-white hover:bg-red-800"
-                        onClick={() => disconnect()}
-                      >
-                        <LogOut />
-                      </Button>
-                    </div>
-                  )}
-
-                  {isConnected && isSyncMessage && (
+                {isConnected && !isSyncMessage && (
+                  <div className="flex gap-2 mt-5">
+                    <Button
+                      className="bg-retro-gray ring-4 ring-retro-black/20 border-r-4 border-r-black border-b-4 border-b-black border-l-2 border-l-white border-t-2 border-t-white p-2 text-left flex items-center space-x-4 hover:bg-gray-400 active:border-l-black active:border-t-black active:border-r-white active:border-b-white"
+                      onClick={() => signMessageWithSign()}
+                    >
+                      Verify Wallet
+                    </Button>
                     <Button
                       variant="outline"
-                      className="w-full rounded-lg bg-red-500 text-white hover:bg-red-800"
+                      size="icon"
+                      className="bg-red-500 text-white hover:bg-red-800"
                       onClick={() => disconnect()}
                     >
-                      Disconnect <LogOut className="ml-1 h-4 w-4" />
+                      <LogOut />
                     </Button>
-                  )}
-                </SidebarFooter>
-              </div>
+                  </div>
+                )}
+
+                {isConnected && isSyncMessage && (
+                  <Button
+                    variant="outline"
+                    className="w-full bg-red-500 text-white hover:bg-red-800"
+                    onClick={() => disconnect()}
+                  >
+                    Disconnect <LogOut className="ml-1 h-4 w-4" />
+                  </Button>
+                )}
+              </Window>
             )}
           </SidebarContent>
         </Sidebar>
