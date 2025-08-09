@@ -33,13 +33,6 @@ export default {
       borderRadius: {},
       animation: {
         "color-stroke-flow": "color-stroke-flow 5s ease-in-out infinite",
-        "text-glitch": "text-glitch 3s ease infinite",
-        "glitch-anim-1": "glitch-anim-1 2s infinite",
-        "glitch-anim-2": "glitch-anim-2 3s infinite",
-        "schizo-glitch-text": "schizo-text-glitch 3s ease infinite",
-        "schizo-glitch-anim-1": "schizo-glitch-anim-1 2s ease infinite",
-        "schizo-glitch-anim-2": "schizo-glitch-anim-2 3s ease infinite",
-        "blink": "blink 1s ease infinite",
       },
       keyframes: {
         "color-stroke-flow": {

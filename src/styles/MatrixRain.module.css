@@ -16,7 +16,7 @@
     position: absolute;
     top: -100%; /* Start above the screen */
     color: #00ff41; /* Bright green color */
-    font-size: 16px;
+    font-size: 20px;
     white-space: nowrap; /* Prevents the vertical text from wrapping */
     user-select: none; /* Prevents text selection */
     animation-name: fall;

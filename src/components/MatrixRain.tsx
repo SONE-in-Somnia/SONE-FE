@@ -15,6 +15,14 @@ const MatrixRain: React.FC = () => {
       "<Let's get hyped on Somnia network>",
     ];
     
+    const retroColors = [
+      "#00FF00", // retro-green
+      "#FFA500", // retro-orange
+      "#FF0000", // retro-red
+      "#FFFF00", // retro-yellow
+      "#F764FF", // retro-pink
+    ];
+
     const spacing = 150; // Increased spacing for longer sentences
     const streamCount = Math.floor(window.innerWidth / spacing);
 
@@ -29,8 +37,12 @@ const MatrixRain: React.FC = () => {
         stream.className = styles.stream;
         
         // Pick a random sentence for each stream
-        const randomIndex = Math.floor(Math.random() * sentences.length);
-        stream.textContent = sentences[randomIndex];
+        const randomSentenceIndex = Math.floor(Math.random() * sentences.length);
+        stream.textContent = sentences[randomSentenceIndex];
+
+        // Pick a random color for each stream
+        const randomColorIndex = Math.floor(Math.random() * retroColors.length);
+        stream.style.color = retroColors[randomColorIndex];
 
         stream.style.left = `${offset + i * spacing}px`;
         
