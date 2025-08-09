@@ -6,11 +6,14 @@ import NftPreview from "../views/home-v2/components/NftPreview";
 import SonesHub from "../views/home-v2/components/SonesHub";
 import SomniaBlog from "../views/home-v2/components/SomniaBlog";
 import TestnetFaucet from "../views/home-v2/components/TestnetFaucet";
+import FloatingEmojis from "../components/FloatingEmojis";
+
 
 const HomeV2Page = () => {
   return (
     <>
       <MatrixRain />
+      <FloatingEmojis />
       <div className="grid grid-cols-12 grid-rows-12 h-[1024px] overflow-hidden gap-3">
 
         {/* Top Banner */}

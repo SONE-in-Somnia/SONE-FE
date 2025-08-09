@@ -1,7 +1,7 @@
 import React from "react";
 import Window from "./Window";
 import { RetroButton } from "@/components/RetroButton";
-import styles from "./SonesHub.module.css";
+import styles from "../../../styles/SonesHub.module.css";
 
 const SonesHub = () => {
   const activities = [

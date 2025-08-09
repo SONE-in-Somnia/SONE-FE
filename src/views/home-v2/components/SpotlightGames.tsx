@@ -2,7 +2,7 @@ import React from "react";
 import Window from "./Window";
 import Image from "next/image";
 import { RetroButton } from "@/components/RetroButton";
-import styles from "./SpotlightGames.module.css";
+import styles from "../../../styles/SpotlightGames.module.css";
 
 const SpotlightGames = () => {
   const games = [
