@@ -39,7 +39,7 @@ const SomniaBlog = () => {
         setCurrentTweetIndex((prevIndex) =>
           (prevIndex + 1) % tweets.length
         );
-      }, 5000); // Change tweet every 5 seconds
+      }, 5000 * 12* 15); // Change tweet every 15 mins
 
       return () => clearInterval(interval);
     }
@@ -49,7 +49,7 @@ const SomniaBlog = () => {
 
   return (
     <Window title="📰 SOMNIA BLOG 📰">
-      <div className="flex space-x-4 h-full relative">
+      <div className="flex space-x-1 h-full relative">
         {loading ? (
           <div className="w-full flex items-center justify-center">
             <p>Loading tweets...</p>
@@ -58,7 +58,7 @@ const SomniaBlog = () => {
           <>
             <div className="w-1/3">
               <Image
-                src="/images/banner_8.png"
+                src="/images/somniaBlog.png"
                 alt="Blog Post"
                 width={100}
                 height={100}
