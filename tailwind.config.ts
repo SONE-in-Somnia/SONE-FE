@@ -33,6 +33,7 @@ export default {
       borderRadius: {},
       animation: {
         "color-stroke-flow": "color-stroke-flow 5s ease-in-out infinite",
+        glitch: "glitch 1s ease-in-out",
       },
       keyframes: {
         "color-stroke-flow": {
@@ -53,7 +54,28 @@ export default {
             "-webkit-text-stroke-color": "var(--retro-pink)",
           },
         },
-        
+        glitch: {
+          "0%": {
+            transform: "translate(0)",
+            opacity: "1",
+          },
+          "25%": {
+            transform: "translate(5px, -5px)",
+            clipPath: "polygon(0 0, 100% 0, 100% 20%, 0 20%)",
+          },
+          "50%": {
+            transform: "translate(-5px, 5px)",
+            clipPath: "polygon(0 80%, 100% 80%, 100% 100%, 0 100%)",
+          },
+          "75%": {
+            transform: "translate(5px, 0px)",
+            clipPath: "polygon(0 40%, 100% 40%, 100% 60%, 0 60%)",
+          },
+          "100%": {
+            transform: "translate(0)",
+            opacity: "1",
+          },
+        },
       },
       fontFamily: {
         "modern-warfare": ["var(--font-modern-warfare)"],
