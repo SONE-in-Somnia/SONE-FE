@@ -36,6 +36,10 @@ export default {
         "text-glitch": "text-glitch 3s ease infinite",
         "glitch-anim-1": "glitch-anim-1 2s infinite",
         "glitch-anim-2": "glitch-anim-2 3s infinite",
+        "schizo-glitch-text": "schizo-text-glitch 3s ease infinite",
+        "schizo-glitch-anim-1": "schizo-glitch-anim-1 2s ease infinite",
+        "schizo-glitch-anim-2": "schizo-glitch-anim-2 3s ease infinite",
+        "blink": "blink 1s ease infinite",
       },
       keyframes: {
         "color-stroke-flow": {
@@ -55,31 +59,6 @@ export default {
             color: "var(--retro-blue)",
             "-webkit-text-stroke-color": "var(--retro-pink)",
           },
-        },
-        "text-glitch": {
-          "0%, 93%, 100%": { transform: "translate(0px)" },
-          "1%": { transform: "translate(-2px, 1px)" },
-          "2%": { transform: "translate(2px, -1px)" },
-          "3%": { transform: "translate(-1px, 2px)" },
-          "4%": { transform: "translate(1px, -2px)" },
-          "5%": { transform: "translate(-1px, 1px)" },
-          "6%": { transform: "translate(2px, 1px)" },
-          "7%": { transform: "translate(-2px, -1px)" },
-          "8%": { transform: "translate(1px, 2px)" },
-          "9%": { transform: "translate(-1px, -2px)" },
-          "10%": { transform: "translate(2px, -2px)" },
-        },
-        "glitch-anim-1": {
-          "0%, 5%, 100%": { transform: "translate(0px)" },
-          "10%": { transform: "translate(-2px, 2px)" },
-          "15%": { transform: "translate(2px, -2px)" },
-          "20%": { transform: "translate(-2px, -2px)" },
-        },
-        "glitch-anim-2": {
-          "0%, 15%, 100%": { transform: "translate(0px)" },
-          "5%": { transform: "translate(2px, 2px)" },
-          "10%": { transform: "translate(-2px, -2px)" },
-          "25%": { transform: "translate(2px, -2px)" },
         },
         
       },

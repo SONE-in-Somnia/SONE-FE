@@ -2,6 +2,7 @@ import React from "react";
 import Window from "./Window";
 import Image from "next/image";
 import { RetroButton } from "@/components/RetroButton";
+import styles from "./SpotlightGames.module.css";
 
 const SpotlightGames = () => {
   const games = [
@@ -9,12 +10,18 @@ const SpotlightGames = () => {
     { name: "Game name", image: "/images/spotlight-img.png" },
   ];
 
+  const warningText = `🚨 WARNING: These games may drive you go crazy,
+extreme addiction 🥵`;
+
   return (
     <Window title="🎮 SPOTLIGHT GAMES ⚔">
       <div className="h-full grid grid-cols-2 grid-rows-5 gap-4">
         <div className="col-span-2 row-span-4 grid grid-cols-2 gap-4">
           {games.map((game, index) => (
-            <div key={index} className="bg-retro-gray-2 ring-4 ring-retro-gray-1 h-[300px] flex flex-col">
+            <div
+              key={index}
+              className="bg-retro-gray-2 ring-4 ring-retro-gray-1 h-[300px] flex flex-col"
+            >
               <div className="h-3/4">
                 <Image
                   src={game.image}
@@ -29,17 +36,16 @@ const SpotlightGames = () => {
                   <div className="w-10 h-10 rounded-full bg-retro-gray"></div>
                   <span className="font-bold">{game.name}</span>
                 </div>
-                <RetroButton>
-                  Play
-                </RetroButton>
+                <RetroButton>Play</RetroButton>
               </div>
             </div>
           ))}
         </div>
-        <div className="col-span-2 row-span-3 bg-black text-[24px] text-retro-pink p-4 text-center leading-5">
-          <p className="text-glitch-effect" data-text="🚨 WARNING: These games may drive you go crazy, extreme addiction 🥵">
-            🚨 WARNING: These games may drive you go crazy,
-            <br /> extreme addiction 🥵
+        <div
+          className={`${styles.warningContainer} col-span-2 row-span-3 bg-black text-[24px] px-4 py-2 text-center text-retro-green`}
+        >
+          <p className={styles.warningText} data-text={warningText}>
+            {warningText}
           </p>
         </div>
       </div>

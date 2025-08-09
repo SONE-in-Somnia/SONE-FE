@@ -1,0 +1,166 @@
+@keyframes shake {
+    0%, 100% {
+        transform: translate(0);
+    }
+    25% {
+        transform: translate(-5px);
+    }
+    75% {
+        transform: translate(5px);
+    }
+}
+
+@keyframes text-glitch {
+    0%,90%,to {
+        transform: translate(0);
+        text-shadow: 3px 3px 0px #000,6px 6px 0px #ff00ff
+    }
+
+    10% {
+        transform: translate(-2px,2px);
+        text-shadow: -3px 3px 0px #ff0000,6px -6px 0px #00ff00
+    }
+
+    20% {
+        transform: translate(2px,-2px);
+        text-shadow: 3px -3px 0px #0000ff,-6px 6px 0px #ffff00
+    }
+
+    30% {
+        transform: translate(-2px,-2px);
+        text-shadow: -3px -3px 0px #ff00ff,6px 6px 0px #00ffff
+    }
+}
+
+/* @keyframes text-glitch {
+    0%,93%,to {
+        transform: translate(0)
+    }
+
+    1% {
+        transform: translate(-2px,1px)
+    }
+
+    2% {
+        transform: translate(2px,-1px)
+    }
+
+    3% {
+        transform: translate(-1px,2px)
+    }
+
+    4% {
+        transform: translate(1px,-2px)
+    }
+
+    5% {
+        transform: translate(-1px,1px)
+    }
+
+    6% {
+        transform: translate(2px,1px)
+    }
+
+    7% {
+        transform: translate(-2px,-1px)
+    }
+
+    8% {
+        transform: translate(1px,2px)
+    }
+
+    9% {
+        transform: translate(-1px,-2px)
+    }
+
+    10% {
+        transform: translate(2px,-2px)
+    }
+} */
+
+@keyframes glitch-anim-1 {
+    0%,5%,to {
+        transform: translate(0)
+    }
+
+    10% {
+        transform: translate(-2px,2px)
+    }
+
+    15% {
+        transform: translate(2px,-2px)
+    }
+
+    20% {
+        transform: translate(-2px,-2px)
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0%,15%,to {
+        transform: translate(0)
+    }
+
+    5% {
+        transform: translate(2px,2px)
+    }
+
+    10% {
+        transform: translate(-2px,-2px)
+    }
+
+    25% {
+        transform: translate(2px,-2px)
+    }
+}
+
+
+@keyframes blink {
+    0%,50% {
+        opacity: 1
+    }
+
+    51%,to {
+        opacity: 0
+    }
+}
+
+.blink {
+    animation: blink 1s infinite
+}
+
+.warningContainer {
+    animation: shake 0.5s infinite;
+    border: 2px solid #00ff00;
+}
+
+.warningText {
+    position: relative;
+    text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff;
+    animation: text-glitch 3s infinite;
+    white-space: pre-wrap;
+}
+
+.warningText::before,
+.warningText::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    white-space: pre-wrap;
+}
+
+.warningText::before {
+    animation: glitch-anim-1 2s infinite;
+    color: #f0f;
+    z-index: -1;
+}
+
+.warningText::after {
+    animation: glitch-anim-2 3s infinite;
+    color: #0ff;
+    z-index: -2;
+}

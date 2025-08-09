@@ -1,0 +1,23 @@
+@keyframes epilepsy-flash {
+    0%, 50% {
+        background-position: 0% 50%;
+    }
+    51%, 100% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes rainbow {
+    0% { background-position: 0% 82%; }
+    50% { background-position: 100% 19%; }
+    100% { background-position: 0% 82%; }
+}
+
+.warningEffect {
+    background: linear-gradient(45deg, red, #ff0, red, #ff0);
+    background-size: 400% 400%;
+    animation: epilepsy-flash .1s infinite, rainbow .5s ease-in-out infinite;
+    border: 3px solid #ff0000;
+    font-weight: 700;
+    text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff;
+}

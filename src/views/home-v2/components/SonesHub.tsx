@@ -1,6 +1,7 @@
 import React from "react";
 import Window from "./Window";
 import { RetroButton } from "@/components/RetroButton";
+import styles from "./SonesHub.module.css";
 
 const SonesHub = () => {
   const activities = [
@@ -39,12 +40,14 @@ const SonesHub = () => {
             );
           })}
         </div>
-        <div className="col-span-1 bg-retro-orange p-3 text-white flex flex-col items-center justify-center text-center h-full">
+        <div
+          className={`${styles.warningEffect} col-span-1 p-3 text-white flex flex-col items-center justify-start text-center h-full`}
+        >
           <h3 className="font-bold text-[24px]">LET'S GO NUT JOIN WITH US</h3>
-          <p className="my-4 text-[24px] font-bold">GET LISTED ON SONE NOW DUDE</p>
-          <RetroButton>
-            DM NOW
-          </RetroButton>
+          <p className="my-4 text-[24px] font-bold">
+            GET LISTED ON SONE NOW DUDE
+          </p>
+          <RetroButton>DM NOW</RetroButton>
         </div>
       </div>
     </Window>
