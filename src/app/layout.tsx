@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import "@/styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import AppContext from "@/context/AppContext";
@@ -20,16 +21,31 @@ export const metadata: Metadata = {
   icons: "/images/logo.svg",
 };
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
+// const montserrat = Montserrat({
+//   subsets: ["latin"],
+//   weight: ["400", "500", "600", "700"],
+//   display: "swap",
+// });
 
 const modernWarfare = localFont({
   src: "../../public/fonts/MODERNWARFARE.ttf",
   variable: "--font-modern-warfare",
 });
+const pixelOperator = localFont({
+  src: "../../public/fonts/PixelOperator.ttf",
+  variable: "--font-pixel-operator",
+});
+
+const pixelOperatorMono = localFont({
+  src: "../../public/fonts/PixelOperatorMono.ttf",
+  variable: "--font-pixel-operator-mono",
+});
+
+const pixelOperatorMonoBold = localFont({
+  src: "../../public/fonts/PixelOperatorMono8-Bold.ttf",
+  variable: "--font-pixel-operator-mono-bold",
+});
+
 
 export default function RootLayout({
   children,
@@ -53,7 +69,7 @@ export default function RootLayout({
         {/* End Google Tag Manager */}
       </head>
       <body
-        className={`containers relative antialiased ${montserrat.className} ${modernWarfare.variable}`}
+        className={`containers relative antialiased ${pixelOperator.variable} ${pixelOperatorMono.variable} ${pixelOperatorMonoBold.variable} ${modernWarfare.variable}`}
       >
         <noscript>
           <iframe
@@ -64,13 +80,21 @@ export default function RootLayout({
           ></iframe>
         </noscript>
         <AppContext>
+          <Image
+            src="/images/WTTIGIF.gif"
+            alt="Background"
+            layout="fill"
+            objectFit="cover"
+            quality={100}
+            className="-z-10"
+          />
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
               <HeaderMobile />
-              <div className="relative mx-auto flex w-full max-w-[1180px] flex-1 flex-col gap-4 p-4">
+              <div className="relative mx-auto flex w-full flex-1 flex-col gap-4 font-pixel-operator">
                 <Notifier />
-                {children}
+                <div className="p-4">{children}</div>
               </div>
             </SidebarInset>
           </SidebarProvider>

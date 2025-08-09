@@ -40,6 +40,7 @@ const menuItemStyles = {
 
 export function NavMain({
   items,
+  variant = "default",
 }: {
   items: {
     title: string;
@@ -55,6 +56,7 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  variant?: "default" | "retro";
 }) {
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -86,12 +88,15 @@ export function NavMain({
     }
 
     // Tạo các lớp CSS tùy chỉnh cho menu item
-    const menuButtonClasses = cn(
-      menuItemStyles.base,
-      menuItemStyles.hover,
-      item.disabled ? menuItemStyles.disabled : "",
-      item.comingSoon ? menuItemStyles.comingSoon : "",
-    );
+    const menuButtonClasses =
+      variant === "retro"
+        ? "bg-retro-gray border-2 border-r-black border-b-black border-l-white border-t-white p-2 text-left flex items-center space-x-4 hover:bg-gray-400 active:border-l-black active:border-t-black active:border-r-white active:border-b-white"
+        : cn(
+            menuItemStyles.base,
+            menuItemStyles.hover,
+            item.disabled ? menuItemStyles.disabled : "",
+            item.comingSoon ? menuItemStyles.comingSoon : ""
+          );
 
     const menuButton = (
       <SidebarMenuButton

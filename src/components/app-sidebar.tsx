@@ -23,33 +23,34 @@ import { LogOut } from "lucide-react";
 import { convertWeiToEther, formatEthereumAddress } from "@/utils/string";
 import { networks } from "@/config";
 import { toast } from "react-toastify";
+import { RetroButton } from "./RetroButton";
 
 // This is sample data.
 const data = {
   navMain: [
     {
-      title: "Discover",
+      title: "DISCOVER",
       url: "/",
       iconName: "globe",
       isActive: true,
       group: "main",
     },
     {
-      title: "Rewards",
+      title: "REWARDS",
       url: "/rewards",
-      iconName: "medal",
+      iconName: "sparkles",
       group: "main",
     },
     {
-      title: "Kuro",
-      url: "/kuro",
-      iconName: "circle-dot-dashed",
+      title: "LEADERBOARD",
+      url: "/leaderboard",
+      iconName: "trophy",
       group: "games",
     },
     {
-      title: "Leaderboard",
-      url: "/leaderboard",
-      iconName: "align-end-horizontal",
+      title: "MY PROFILE",
+      url: "/myprofile",
+      iconName: "rocket",
       group: "social",
     },
   ],
@@ -60,8 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isConnected, address } = useAppKitAccount();
   const { setOpenMobile, openMobile, isMobile } = useSidebar();
   const { open, close } = useAppKit();
-  const { user, signMessageWithSign, isSyncMessage, supportedTokens } =
-    useAuth();
+  const { user, signMessageWithSign, isSyncMessage, supportedTokens } = useAuth();
   const { disconnect } = useDisconnect();
 
   // Cập nhật trạng thái active dựa trên pathname hiện tại
@@ -83,20 +83,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       >
         <Sidebar
           collapsible="none"
-          className={`h-full rounded-xl bg-white max-lg:bg-background`}
+          className={`h-full bg-retro-gray border-2 border-r-black border-b-black border-l-white border-t-white max-lg:bg-background`}
           {...props}
         >
           <SidebarHeader className="">
             <div className="flex items-center justify-between px-3 py-2">
-              <div className="px-2">
+              <div className="">
                 <Link href="/" className="flex items-center gap-2">
-                  <Image
-                    src="/images/logo.svg"
-                    width={32}
-                    height={32}
-                    alt="logo"
-                    priority
-                  />
+                    <Image
+                      src="/images/logo.svg"
+                      width={42}
+                      height={42}
+                      alt="logo"
+                      priority
+                      className="rounded-md"
+                    />
                   <h1 className="font-modern-warfare text-gradient w-fit text-4xl">
                     SONE
                   </h1>
@@ -107,78 +108,80 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <Divider />
           <SidebarContent className="flex h-[calc(100vh-64px)] flex-col overflow-y-auto px-3">
             <div className="flex-1">
-              <NavMain items={navItems} />
-              {/* Nút Connect Wallet luôn nằm dưới item cuối cùng của navbar */}
+              <NavMain items={navItems} variant="retro" />
               {!isConnected && (
-                <Button
-                  className="h-9 w-full whitespace-nowrap bg-gradient-to-r from-[#E83C61] to-[#9950E9] text-white"
+                <RetroButton
+                  className="h-9 w-full whitespace-nowrap font-pixel-operator"
                   onClick={() => open()}
                 >
                   Connect Wallet
-                </Button>
+                </RetroButton>
               )}
             </div>
-          </SidebarContent>
-
-          <div className="p-2">
-            <SidebarFooter
-              className={`rounded-xl p-4 ${isConnected && "bg-background"}`}
-            >
-              {isConnected && (
-                <div className="flex items-center justify-between gap-1">
-                  <span
-                    onClick={() => {
-                      if (!address) return;
-                      try {
-                        navigator.clipboard.writeText(address);
-                        toast.success("Copied to clipboard!");
-                      } catch (err) {
-                        toast.error("Failed to copy address");
-                      }
-                    }}
-                    className="cursor-pointer hover:underline"
-                  >
-                    {formatEthereumAddress(address)}
-                  </span>
-                  <span className="text-lg font-bold">
-                    {supportedTokens.length > 0
-                      ? convertWeiToEther(supportedTokens[0].balance || 0)
-                      : "0"}{" "}
-                    {networks[0].nativeCurrency.symbol}
-                  </span>
-                </div>
-              )}
-
-              {isConnected && !isSyncMessage && (
-                <div className="flex gap-2">
-                  <Button
-                    className="flex-1 rounded-lg bg-gradient-to-r from-[#E83C61] to-[#9950E9] text-white"
-                    onClick={() => signMessageWithSign()}
-                  >
-                    Verify Wallet
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="bg-red-500 text-white hover:bg-red-800"
-                    onClick={() => disconnect()}
-                  >
-                    <LogOut />
-                  </Button>
-                </div>
-              )}
-
-              {isConnected && isSyncMessage && (
-                <Button
-                  variant="outline"
-                  className="w-full rounded-lg bg-red-500 text-white hover:bg-red-800"
-                  onClick={() => disconnect()}
+            {isConnected && (
+              <div className="p-2">
+                <SidebarFooter
+                  className={`rounded-xl p-4 ${
+                    isConnected && "bg-background"
+                  }`}
                 >
-                  Disconnect <LogOut className="ml-1 h-4 w-4" />
-                </Button>
-              )}
-            </SidebarFooter>
-          </div>
+                  {isConnected && (
+                    <div className="flex items-center justify-between gap-1">
+                      <span
+                        onClick={() => {
+                          if (!address) return;
+                          try {
+                            navigator.clipboard.writeText(address);
+                            toast.success("Copied to clipboard!");
+                          } catch (err) {
+                            toast.error("Failed to copy address");
+                          }
+                        }}
+                        className="cursor-pointer hover:underline"
+                      >
+                        {formatEthereumAddress(address)}
+                      </span>
+                      <span className="text-lg font-bold">
+                        {supportedTokens.length > 0
+                          ? convertWeiToEther(supportedTokens[0].balance || 0)
+                          : "0"}{" "}
+                        {networks[0].nativeCurrency.symbol}
+                      </span>
+                    </div>
+                  )}
+
+                  {isConnected && !isSyncMessage && (
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1 rounded-lg bg-gradient-to-r from-[#E83C61] to-[#9950E9] text-white"
+                        onClick={() => signMessageWithSign()}
+                      >
+                        Verify Wallet
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-red-500 text-white hover:bg-red-800"
+                        onClick={() => disconnect()}
+                      >
+                        <LogOut />
+                      </Button>
+                    </div>
+                  )}
+
+                  {isConnected && isSyncMessage && (
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-lg bg-red-500 text-white hover:bg-red-800"
+                      onClick={() => disconnect()}
+                    >
+                      Disconnect <LogOut className="ml-1 h-4 w-4" />
+                    </Button>
+                  )}
+                </SidebarFooter>
+              </div>
+            )}
+          </SidebarContent>
         </Sidebar>
       </div>
     </>

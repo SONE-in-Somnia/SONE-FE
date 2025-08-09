@@ -16,12 +16,78 @@ export default {
       colors: {
         text: "#1E1E1E",
         background: "#dedede",
+        "retro-gray": "#C0C0C0",
+        "retro-gray-1": "#A8A8A8",
+        "retro-gray-2": "#E9E9E9",
+        "retro-gray-3": "#D0D0D0",
+        "retro-gray-4": "#ACACAC",
+        "retro-blue": "#000080",
+        "retro-green": "#00FF00",
+        "retro-orange": "#FFA500",
+        "retro-red": "#FF0000",
+        "retro-yellow": "#FFFF00",
+        "retro-pink": "#F764FF",
+        "retro-black": "#1E1E1E",
+
       },
       borderRadius: {},
-      animation: {},
-      keyframes: {},
+      animation: {
+        "color-stroke-flow": "color-stroke-flow 5s ease-in-out infinite",
+        "text-glitch": "text-glitch 3s ease infinite",
+        "glitch-anim-1": "glitch-anim-1 2s infinite",
+        "glitch-anim-2": "glitch-anim-2 3s infinite",
+      },
+      keyframes: {
+        "color-stroke-flow": {
+          "0%, 100%": {
+            color: "var(--retro-pink)",
+            "-webkit-text-stroke-color": "var(--retro-yellow)",
+          },
+          "25%": {
+            color: "var(--retro-yellow)",
+            "-webkit-text-stroke-color": "var(--retro-green)",
+          },
+          "50%": {
+            color: "var(--retro-green)",
+            "-webkit-text-stroke-color": "var(--retro-blue)",
+          },
+          "75%": {
+            color: "var(--retro-blue)",
+            "-webkit-text-stroke-color": "var(--retro-pink)",
+          },
+        },
+        "text-glitch": {
+          "0%, 93%, 100%": { transform: "translate(0px)" },
+          "1%": { transform: "translate(-2px, 1px)" },
+          "2%": { transform: "translate(2px, -1px)" },
+          "3%": { transform: "translate(-1px, 2px)" },
+          "4%": { transform: "translate(1px, -2px)" },
+          "5%": { transform: "translate(-1px, 1px)" },
+          "6%": { transform: "translate(2px, 1px)" },
+          "7%": { transform: "translate(-2px, -1px)" },
+          "8%": { transform: "translate(1px, 2px)" },
+          "9%": { transform: "translate(-1px, -2px)" },
+          "10%": { transform: "translate(2px, -2px)" },
+        },
+        "glitch-anim-1": {
+          "0%, 5%, 100%": { transform: "translate(0px)" },
+          "10%": { transform: "translate(-2px, 2px)" },
+          "15%": { transform: "translate(2px, -2px)" },
+          "20%": { transform: "translate(-2px, -2px)" },
+        },
+        "glitch-anim-2": {
+          "0%, 15%, 100%": { transform: "translate(0px)" },
+          "5%": { transform: "translate(2px, 2px)" },
+          "10%": { transform: "translate(-2px, -2px)" },
+          "25%": { transform: "translate(2px, -2px)" },
+        },
+        
+      },
       fontFamily: {
         "modern-warfare": ["var(--font-modern-warfare)"],
+        "pixel-operator": ["PixelOperator", "sans-serif"],
+        "pixel-operator-mono": ["PixelOperatorMono", "sans-serif"],
+        "pixel-operator-mono-bold": ["PixelOperatorMonoBold", "sans-serif"],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
