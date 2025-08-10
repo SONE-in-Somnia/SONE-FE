@@ -7,7 +7,8 @@
     "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start -p 2342",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed:twitter": "node scripts/seed-twitter-cache.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -80,12 +81,14 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "cross-env": "^7.0.3",
+    "dotenv": "^17.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
     "prettier": "^3.5.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
