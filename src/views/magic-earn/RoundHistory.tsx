@@ -28,7 +28,7 @@ const RoundHistory = () => {
   const [activeTab, setActiveTab] = useState<"all" | "youWin">("all");
 
   useEffect(() => {
-    refetchHistories();
+    refetchHistories(1, 10, activeTab);
   }, [activeTab, address]);
 
   return (

@@ -47,7 +47,6 @@ const NftPreview = () => {
             } ${isAnimating && index === currentImageIndex ? "animate-glitch" : ""}`}
           />
         ))}
-        <div className="absolute inset-0 blur-sm"></div>
       </div>
     </Window>
   );

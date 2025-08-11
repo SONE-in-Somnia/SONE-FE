@@ -55,14 +55,17 @@ async function seedTwitterCache() {
     }
 
     const tweetsData = await tweetsResponse.json();
-    const latestTweet = tweetsData.data && tweetsData.data.length > 0 ? tweetsData.data[0] : null;
+    const latestTweets = tweetsData.data || [];
 
-    if (!latestTweet) {
+    if (latestTweets.length === 0) {
       console.warn("Warning: No tweets found for this user. The cache will be created with an empty array.");
     }
 
     // 3. Transform and Save to Cache File
-    const transformedTweets: Tweet[] = latestTweet ? [{ id: latestTweet.id, text: latestTweet.text }] : [];
+    const transformedTweets: Tweet[] = latestTweets.map((tweet: Tweet) => ({
+      id: tweet.id,
+      text: tweet.text,
+    }));
     
     const cacheContent = {
       tweets: transformedTweets,

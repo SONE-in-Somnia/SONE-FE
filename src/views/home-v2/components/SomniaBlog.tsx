@@ -18,9 +18,10 @@ const SomniaBlog = () => {
   useEffect(() => {
     const fetchTweets = async () => {
       try {
-        const response = await fetch("/api/twitter");
+        // Using the local cache directly for simplicity
+        const response = await fetch('/twitter-cache.json');
         const data = await response.json();
-        if (data.tweets) {
+        if (data && data.tweets && data.tweets.length > 0) {
           setTweets(data.tweets);
         }
       } catch (error) {
@@ -34,18 +35,17 @@ const SomniaBlog = () => {
   }, []);
 
   useEffect(() => {
-    if (tweets.length > 0) {
+    if (tweets.length > 1) {
       const interval = setInterval(() => {
-        setCurrentTweetIndex((prevIndex) =>
-          (prevIndex + 1) % tweets.length
-        );
-      }, 5000 * 12* 15); // Change tweet every 15 mins
+        setCurrentTweetIndex((prevIndex) => (prevIndex + 1) % tweets.length);
+      }, 30000); // Change tweet every 30 seconds
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval); // Cleanup on component unmount
     }
   }, [tweets]);
 
   const currentTweet = tweets[currentTweetIndex];
+  const tweetUrl = currentTweet ? `https://twitter.com/Somnia_Network/status/${currentTweet.id}` : "#";
 
   return (
     <Window title="📰 SOMNIA BLOG 📰">
@@ -68,15 +68,17 @@ const SomniaBlog = () => {
               <h3 className="font-bold">Somnia @Somnia_Network</h3>
               <p className="text-sm">{currentTweet.text}</p>
             </div>
-            <RetroButton className="absolute top-0 right-0 w-8 h-8 p-2">
-              <Image
-                src="/images/Vector.png"
-                alt="Go"
-                width={48}
-                height={48}
-                className="w-full h-full"
-              />
-            </RetroButton>
+            <a href={tweetUrl} target="_blank" rel="noopener noreferrer" className="absolute top-0 right-0">
+              <RetroButton className="w-8 h-8 p-2">
+                <Image
+                  src="/images/Vector.png"
+                  alt="Go"
+                  width={48}
+                  height={48}
+                  className="w-full h-full"
+                />
+              </RetroButton>
+            </a>
           </>
         ) : (
           <div className="w-full flex items-center justify-center">

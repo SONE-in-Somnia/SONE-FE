@@ -1,13 +1,17 @@
+"use client";
+
 import React from "react";
 import Window from "./Window";
 import Image from "next/image";
 import { RetroButton } from "@/components/RetroButton";
 import styles from "../../../styles/SpotlightGames.module.css";
+import { useRouter } from "next/navigation";
 
 const SpotlightGames = () => {
+  const router = useRouter();
   const games = [
-    { name: "Game name", image: "/images/spotlight-img.png" },
-    { name: "Game name", image: "/images/spotlight-img.png" },
+    { name: "Wheely Wheely", image: "/images/spotlight-img.png", link: "/wheely-wheely" },
+    { name: "Game name", image: "/images/spotlight-img.png", link: "#" },
   ];
 
   const warningText = `🚨 WARNING: These games may drive you go crazy,
@@ -36,7 +40,7 @@ extreme addiction 🥵`;
                   <div className="w-10 h-10 rounded-full bg-retro-gray"></div>
                   <span className="font-bold">{game.name}</span>
                 </div>
-                <RetroButton>Play</RetroButton>
+                <RetroButton onClick={() => router.push(game.link)}>Play</RetroButton>
               </div>
             </div>
           ))}

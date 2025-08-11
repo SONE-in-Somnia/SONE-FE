@@ -27,7 +27,9 @@ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface RandomWheelProps {}
+interface RandomWheelProps {
+  size?: number;
+}
 
 export const colors = [
   "#4DFFFF", // Blue neon (từ #33CCFF)
@@ -116,7 +118,7 @@ const getTotalEntriesByTokenAddress = (
   return mapToken;
 };
 
-const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
+const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
   const { kuroData, winnerData, refetchHistories, poolStatus, setPoolStatus } =
     useKuro();
   const { getTokenSymbolByAddress } = useAuth();
@@ -259,20 +261,27 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
     return data;
   };
 
-  const updateTimer = async () => {
+  const updateTimer = useCallback(() => {
     if (kuroData?.startTime && kuroData.endTime) {
-      const now = new Date().getTime() / 1000;
+      const now = new Date().getTime(); // Use milliseconds
+      const startTime = kuroData.startTime;
+      const endTime = kuroData.endTime;
 
-      const rangeTime = kuroData?.endTime - kuroData.startTime;
-      const process = now - kuroData?.startTime;
-
-      if (process > rangeTime) {
+      if (now >= endTime) {
         setProgress(0);
+        return;
+      }
+      
+      const totalDuration = endTime - startTime;
+      const elapsedTime = now - startTime;
+      
+      if (totalDuration > 0) {
+        setProgress(1 - (elapsedTime / totalDuration));
       } else {
-        setProgress(1 - process / rangeTime);
+        setProgress(0);
       }
     }
-  };
+  }, [kuroData]);
 
   useEffect(() => {
     if (!kuroData) return;
@@ -306,7 +315,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
     ) {
       return;
     } else if (poolStatus === PoolStatus.DEPOSIT_IN_PROGRESS) {
-      interval = setInterval(updateTimer, 10);
+      interval = setInterval(updateTimer, 100); // Update more frequently for smoother animation
     } else if (poolStatus === PoolStatus.SPINNING && winnerData) {
       spinWheel(winnerData.winner);
     } else if (poolStatus === PoolStatus.SHOWING_WINNER) {
@@ -322,7 +331,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
         clearTimeout(timeOut);
       }
     };
-  }, [poolStatus, winnerData]);
+  }, [poolStatus, winnerData, updateTimer]);
 
   useEffect(() => {
     if (isYouAreWinner) {
@@ -334,6 +343,22 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
 
   return (
     <>
+      <style>
+        {`
+          .MuiCharts-tooltip-root * {
+            font-family: var(--font-pixel-operator) !important;
+          }
+          .MuiCharts-tooltip-root {
+            font-family: var(--font-pixel-operator) !important;
+          }
+          .MuiPieArc-root {
+            filter: drop-shadow(3px 9px 0px rgba(0, 0, 0, 0.75));
+          }
+          .pool-wheel-custom, .MuiPieChart-root, .MuiPieChart-root svg {
+            overflow: visible !important;
+          }
+        `}
+      </style>
       {isYouAreWinner && (
         <div className="fixed left-0 top-0 z-[100] grid h-screen w-screen place-items-center bg-black/40 backdrop-blur-sm">
           <div className="show-winner-animate flex flex-col items-center justify-center gap-4">
@@ -388,11 +413,10 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
             margin: "0 auto",
             textAlign: "center",
             position: "relative",
-            padding: "20px",
           }}
-          className="w-fit"
+          className="w-full overflow-visible"
         >
-          <div className="relative h-fit w-fit rounded-full p-3">
+          <div className="relative h-full w-full rounded-full overflow-visible">
             <Image
               src={"/images/arrow.svg"}
               alt="arrow"
@@ -432,8 +456,8 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
                 </>
               )}
             </div>
-            <div className="absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rotate-90">
-              <svg className="h-full w-full" viewBox="0 0 100 100">
+            <div className="absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rotate-90 rounded-full">
+              <svg className="h-full w-full !overflow-visible" >
                 <defs>
                   <clipPath id="circleClip">
                     <path
@@ -469,19 +493,19 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
               ref={chartRef}
               style={{
                 position: "relative",
-                width: "400px",
-                height: "400px",
+                width: `${size}px`,
+                height: `${size}px`,
                 transformOrigin: "center center",
               }}
-              className="pool-wheel-custom"
+              className="pool-wheel-custom rounded-full overflow-visible"
             >
               <PieChart
                 series={[
                   {
-                    innerRadius: 170,
-                    outerRadius: 200,
+                    innerRadius: size * 0.425,
+                    outerRadius: size * 0.5,
                     paddingAngle: 2,
-                    cornerRadius: 40,
+                    cornerRadius: 0,
                     startAngle: 0,
                     endAngle: 360,
                     data:
@@ -508,16 +532,17 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({}) => {
 
                     highlightScope: { fade: "global", highlight: "item" },
                     faded: {
-                      innerRadius: 150,
+                      innerRadius: size * 0.375,
                       additionalRadius: -30,
                       color: "gray",
                     },
                   },
                 ]}
                 margin={{ right: 5 }}
-                width={400}
-                height={400}
+                width={size}
+                height={size}
                 legend={{ hidden: true }}
+
               />
             </div>
           </div>

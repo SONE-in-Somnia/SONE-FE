@@ -28,6 +28,7 @@ export default {
         "retro-yellow": "#FFFF00",
         "retro-pink": "#F764FF",
         "retro-black": "#1E1E1E",
+        "retro-purple": "#9C63FA40",
 
       },
       borderRadius: {},

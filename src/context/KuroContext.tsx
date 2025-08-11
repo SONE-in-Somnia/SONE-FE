@@ -1,603 +1,306 @@
 "use client";
-import React, {
+
+import { KuroData, KuroParticipant } from "@/types/round";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
   createContext,
   useContext,
-  useEffect,
   useState,
-  useCallback,
-  ReactNode,
 } from "react";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import {
-  JackpotRound,
-  KuroParticipant,
-  KuroWinnerAnnounced,
-  Round,
-  RoundHistoryResponse,
-} from "@/types/round";
-import { useGetKuroHistory } from "@/api/useGetKuroHistory";
-import { YoloABI, YoloABIMultiToken } from "@/abi/YoloABI";
-import { useWriteContract } from "wagmi";
-import useClaimKuroRound from "@/api/useClaimKuroRound";
-import { useAuth } from "./AuthContext";
-import { useAppKitAccount } from "@reown/appkit/react";
-import { useGetJackpotHistory } from "@/api/useGetJackpotHistory";
-import { useSocket } from "./SocketContext";
-
-export enum TimeEnum {
-  _5SECS = 5 * 1000,
-  _9SECS = 9 * 1000,
-  _10SECS = 10 * 1000,
-  _15SECS = 15 * 1000,
-  _30SECS = 30 * 1000,
-  _10MINS = 10 * 60 * 1000,
-  _15MINS = 15 * 60 * 1000,
-  _20MINS = 20 * 60 * 1000,
-  _30MINS = 30 * 60 * 1000,
-  _1HOUR = 60 * 60 * 1000,
-  _1DAY = 60 * 60 * 24 * 1000,
-}
+import { parseEther } from "viem";
 
 export enum PoolStatus {
-  WAITING_FOR_NEXT_ROUND = "WAITING FOR NEXT ROUND",
-  WAIT_FOR_FIST_DEPOSIT = "WAIT FOR FIRST DEPOSIT",
-  DEPOSIT_IN_PROGRESS = "DEPOSIT IN PROGRESS",
-  DRAWING_WINNER = "DRAWING WINNER",
-  SPINNING = "SPINNING",
-  FINISHED = "FINISHED",
-  CANCELED = "CANCELED",
-  SHOWING_WINNER = "SHOWING WINNER",
+  WAIT_FOR_FIST_DEPOSIT,
+  DEPOSIT_IN_PROGRESS,
+  DRAWING_WINNER,
+  SPINNING,
+  SHOWING_WINNER,
+  WAITING_FOR_NEXT_ROUND,
 }
 
-export enum KuroStatus {
-  NONE = 0,
-  OPEN = 1,
-  DRAWING = 2,
-  DRAWN = 3,
-  CANCELLED = 4,
+export enum TimeEnum {
+  _1MIN = 60000,
+  _5SECS = 5000,
+  _9SECS = 9000,
+  _15SECS = 15000,
+  _1DAY = 86400000,
 }
 
-// Định nghĩa các kiểu dữ liệu
-export interface Participant {
-  address: string;
-  deposit: string;
+export interface HistoryData {
+  data: any[];
+  total: number;
 }
 
-export interface KuroData {
-  roundId: string;
-  status: number;
-  startTime: number;
-  endTime: number;
-  drawnAt: number;
-  numberOfParticipants: number;
-  winner: string;
-  totalValue: string;
-  totalEntries: string;
-  participants: KuroParticipant[];
-  remainingTime?: number;
-  isHistoricalRound?: boolean;
-  currentRoundId?: string;
-  error?: string;
-}
-
-export interface WinnerData {
-  roundId: number;
-  winner: string;
-  drawnAt: number;
-  totalValue: string;
-  participants: KuroParticipant[];
-}
-
-interface KuroContextProps {
+interface IKuroContext {
   kuroData: KuroData | null;
-  winnerData: WinnerData | null;
-  formatEther: (value: string) => string;
-  handleClaimPrizes: (
-    roundId: number,
-    userDepositIndices: bigint[],
-    kuroContractAddress?: string,
-  ) => Promise<void>;
-  handleWithdraw: (
-    roundId: number,
-    userDepositIndices: bigint[],
-    kuroContractAddress?: string,
-  ) => Promise<void>;
+  winnerData: KuroParticipant | null;
   poolStatus: PoolStatus;
-  setPoolStatus: (status: PoolStatus) => void;
-
-  allHistories: RoundHistoryResponse<Round> | null;
-  myWinHistories: RoundHistoryResponse<Round> | null;
-  refetchHistories: (
-    page?: number,
-    limit?: number,
-    type?: "all" | "youWin",
-  ) => Promise<void>;
-  isFetchingKuroHistory: boolean;
-  allJackpotHistories: RoundHistoryResponse<JackpotRound> | null;
-  myJackpotHistories: RoundHistoryResponse<JackpotRound> | null;
-  refetchJackpotHistories: (
-    page?: number,
-    limit?: number,
-    type?: "all" | "youWin",
-  ) => Promise<void>;
-  isFetchingJackpotHistory: boolean;
+  setPoolStatus: Dispatch<SetStateAction<PoolStatus>>;
+  addEntry: (address: string, amount: string) => Promise<string | null>;
+  updateGameData: (data: Partial<KuroData>) => void;
+  refetchCounter: number;
+  triggerRefetch: () => void;
   registerKuroListener: () => void;
   unRegisterKuroListener: () => void;
+  handleClaimPrizes: (
+    roundId: number,
+    entries: any[],
+    contractAddress: string,
+  ) => Promise<void>;
+  refetchHistories: (page: number, limit: number, type: string) => void;
+  isFetchingKuroHistory: boolean;
+  allHistories: HistoryData;
+  myWinHistories: HistoryData;
+  handleWithdraw: (
+    roundId: number,
+    deposits: bigint[],
+    contractAddress: string,
+  ) => Promise<void>;
+  refetchJackpotHistories: (page: number, limit: number, type: string) => void;
+  isFetchingJackpotHistory: boolean;
+  allJackpotHistories: HistoryData;
+  myJackpotHistories: HistoryData;
 }
 
-interface KuroProviderProps {
-  children: ReactNode;
-}
+export const KuroContext = createContext<IKuroContext>({
+  kuroData: null,
+  winnerData: null,
+  poolStatus: PoolStatus.WAIT_FOR_FIST_DEPOSIT,
+  setPoolStatus: () => {},
+  addEntry: async () => null,
+  updateGameData: () => {},
+  refetchCounter: 0,
+  triggerRefetch: () => {},
+  registerKuroListener: () => {},
+  unRegisterKuroListener: () => {},
+  handleClaimPrizes: async () => {},
+  refetchHistories: () => {},
+  isFetchingKuroHistory: false,
+  allHistories: { data: [], total: 0 },
+  myWinHistories: { data: [], total: 0 },
+  handleWithdraw: async () => {},
+  refetchJackpotHistories: () => {},
+  isFetchingJackpotHistory: false,
+  allJackpotHistories: { data: [], total: 0 },
+  myJackpotHistories: { data: [], total: 0 },
+});
 
-// Tạo context
-const KuroContext = createContext<KuroContextProps | undefined>(undefined);
-
-// Format Wei thành Ether
-const formatEther = (value: string): string => {
-  if (!value) return "0";
-
-  try {
-    const wei = BigInt(value);
-    const divisor = BigInt(10 ** 18);
-    const integerPart = wei / divisor;
-    const fractionalPart = wei % divisor;
-
-    // Định dạng phần thập phân
-    let fractionalStr = fractionalPart.toString().padStart(18, "0");
-    // Loại bỏ số 0 ở cuối
-    fractionalStr = fractionalStr.replace(/0+$/, "");
-
-    if (fractionalStr) {
-      return `${integerPart}.${fractionalStr}`;
-    } else {
-      return `${integerPart}`;
-    }
-  } catch (error) {
-    console.error("Error formatting ether value:", error);
-    return "0";
-  }
-};
-
-export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
-  const { address } = useAppKitAccount();
-
-  const { isSyncMessage, signMessageWithSign, nativeBalance } = useAuth();
-  const [kuroData, setKuroData] = useState<KuroData | null>(null);
-  const [winnerData, setWinnerData] = useState<WinnerData | null>(null);
-  const [allHistories, setAllHistories] =
-    useState<RoundHistoryResponse<Round> | null>(null);
-  const [poolStatus, setPoolStatus] = useState(
-    PoolStatus.WAIT_FOR_FIST_DEPOSIT,
+export const KuroProvider = ({ children }: { children: ReactNode }) => {
+  const [kuroData, setKuroData] = useState<KuroData | null>({
+    roundId: 1235,
+    participants: [],
+    totalValue: "0",
+    startTime: 0,
+    endTime: new Date().getTime() + 30 * 60 * 1000 + 45 * 1000,
+  });
+  const [winnerData, setWinnerData] = useState<KuroParticipant | null>(null);
+  const [poolStatus, setPoolStatus] = useState<PoolStatus>(
+    PoolStatus.DEPOSIT_IN_PROGRESS,
   );
-  const [myWinHistories, setMyWinHistories] =
-    useState<RoundHistoryResponse<Round> | null>(null);
-  const [allJackpotHistories, setAllJackpotHistories] =
-    useState<RoundHistoryResponse<JackpotRound> | null>(null);
-  const [myJackpotHistories, setMyJackpotHistories] =
-    useState<RoundHistoryResponse<JackpotRound> | null>(null);
-  const { socket, registerSocketListener, unRegisterSocketListener } =
-    useSocket();
+  const [refetchCounter, setRefetchCounter] = useState(0);
+  const [isFetchingKuroHistory, setIsFetchingKuroHistory] = useState(false);
+  const [allHistories, setAllHistories] = useState<HistoryData>({
+    data: [],
+    total: 0,
+  });
+  const [myWinHistories, setMyWinHistories] = useState<HistoryData>({
+    data: [],
+    total: 0,
+  });
+  const [isFetchingJackpotHistory, setIsFetchingJackpotHistory] =
+    useState(false);
+  const [allJackpotHistories, setAllJackpotHistories] = useState<HistoryData>({
+    data: [],
+    total: 0,
+  });
+  const [myJackpotHistories, setMyJackpotHistories] = useState<HistoryData>({
+    data: [],
+    total: 0,
+  });
 
-  const { updateSupportedTokens } = useAuth();
+  const triggerRefetch = () => setRefetchCounter((prev) => prev + 1);
 
-  const { writeContractAsync, isPending: isDepositing } = useWriteContract();
-  const { writeContractAsync: claimKuroMultiToken, isPending: isClaiming } =
-    useWriteContract();
-  const { writeContractAsync: withdrawMultiToken, isPending: isWithdrawing } =
-    useWriteContract();
+  const updateGameData = (data: Partial<KuroData>) => {
+    setKuroData((prevData) => ({
+      ...(prevData as KuroData),
+      ...data,
+    }));
+  };
 
-  const _claimKuroRound = useClaimKuroRound();
+  const registerKuroListener = () => {
+    console.log("Kuro listener registered (placeholder)");
+  };
 
-  const { mutateAsync: mutateAsyncHistory, isPending: isFetchingKuroHistory } =
-    useGetKuroHistory();
-  const {
-    mutateAsync: mutateAsyncJackpotHistory,
-    isPending: isFetchingJackpotHistory,
-  } = useGetJackpotHistory();
+  const unRegisterKuroListener = () => {
+    console.log("Kuro listener unregistered (placeholder)");
+  };
 
   const handleClaimPrizes = async (
     roundId: number,
-    userDepositIndices: bigint[],
-    kuroContractAddress?: string,
+    entries: any[],
+    contractAddress: string,
   ) => {
-    if (userDepositIndices.length == 0) {
-      toast.error("No prizes to claim");
-      return;
-    }
-
-    if (!isSyncMessage) {
-      toast.info("You need to sign first before claiming prizes");
-      await signMessageWithSign();
-    }
-
-    try {
-      let res;
-
-      if (kuroContractAddress) {
-        // new contract address
-        if (
-          kuroContractAddress.toLowerCase() ===
-          process.env.NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS?.toLowerCase()
-        ) {
-          res = claimKuroMultiToken({
-            abi: YoloABIMultiToken,
-            address: process.env
-              .NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS as `0x${string}`,
-            functionName: "claimPrizes",
-            args: [
-              {
-                roundId: BigInt(roundId),
-                depositIndices: userDepositIndices.map((amount, index) =>
-                  BigInt(index),
-                ),
-              },
-            ],
-          });
-        } else {
-          toast.error("Invalid contract address");
-          return;
-        }
-      } else {
-        // old contract address
-        res = writeContractAsync({
-          abi: YoloABI,
-          address: process.env.NEXT_PUBLIC_KURO_ADDRESS as `0x${string}`,
-          functionName: "claimPrizes",
-          args: [
-            {
-              roundId: BigInt(roundId),
-              depositIndices: userDepositIndices.map((amount, index) =>
-                BigInt(index),
-              ),
-            },
-          ],
-        });
-      }
-
-      toast
-        .promise(res, {
-          pending: "Claim processing..",
-          success: "Claim Success. 👌",
-          error: "Claim failed. 🤯",
-        })
-        .then((txHash) => {
-          updateSupportedTokens();
-
-          _claimKuroRound
-            .mutateAsync({
-              roundId: roundId,
-              txHash: txHash,
-            })
-            .then(() => {
-              refetchHistories();
-            });
-        });
-    } catch (error) {
-      console.error("Error claiming prizes:", error);
-      toast.error("Failed to claim prizes");
-    }
+    console.log(
+      `Claiming prizes for round ${roundId} at ${contractAddress} with entries:`,
+      entries,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   };
 
   const handleWithdraw = async (
     roundId: number,
-    userDepositIndices: bigint[],
-    kuroContractAddress?: string,
+    deposits: bigint[],
+    contractAddress: string,
   ) => {
-    if (!isSyncMessage) {
-      toast.info("You need to sign first before Withdraw prizes");
-      await signMessageWithSign();
-    }
+    console.log(
+      `Withdrawing from round ${roundId} at ${contractAddress} with deposits:`,
+      deposits,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  };
+
+  const refetchHistories = (page: number, limit: number, type: string) => {
+    console.log(
+      `Refetching histories for ${type} page ${page} limit ${limit} (placeholder)`,
+    );
+    setIsFetchingKuroHistory(true);
+    setTimeout(() => {
+      if (type === "all") {
+        setAllHistories({ data: [], total: 0 }); // Placeholder for new data
+      } else {
+        setMyWinHistories({ data: [], total: 0 }); // Placeholder for new data
+      }
+      setIsFetchingKuroHistory(false);
+    }, 1000);
+  };
+
+  const refetchJackpotHistories = (
+    page: number,
+    limit: number,
+    type: string,
+  ) => {
+    console.log(
+      `Refetching jackpot histories for ${type} page ${page} limit ${limit} (placeholder)`,
+    );
+    setIsFetchingJackpotHistory(true);
+    setTimeout(() => {
+      if (type === "all") {
+        setAllJackpotHistories({ data: [], total: 0 }); // Placeholder
+      } else {
+        setMyJackpotHistories({ data: [], total: 0 }); // Placeholder
+      }
+      setIsFetchingJackpotHistory(false);
+    }, 1000);
+  };
+
+  const addEntry = async (
+    address: string,
+    amount: string,
+  ): Promise<string | null> => {
+    console.log(`Simulating deposit of ${amount} for ${address}...`);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     try {
-      let res;
+      const amountWei = parseEther(amount);
 
-      if (kuroContractAddress) {
-        // new contract address
-        if (
-          kuroContractAddress.toLowerCase() ===
-          process.env.NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS?.toLowerCase()
-        ) {
-          const specialRound = [4855, 5022, 5062];
-          console.log(roundId);
+      setKuroData((prevData) => {
+        if (!prevData) return null;
 
-          const getUserDepositIndicesSpecialRound = (): bigint[] => {
-            const _userDepositIndices: bigint[] = [];
-            for (let i = 0; i < userDepositIndices.length; i++) {
-              if (i !== 0) {
-                _userDepositIndices.push(BigInt(i));
-              }
+        const playerIndex = prevData.participants.findIndex(
+          (p) => p.address.toLowerCase() === address.toLowerCase(),
+        );
+
+        let newParticipants;
+
+        if (playerIndex > -1) {
+          // Player exists, create a new participants array with the updated player
+          newParticipants = prevData.participants.map((p, index) => {
+            if (index === playerIndex) {
+              return {
+                ...p,
+                deposits: [
+                  ...p.deposits,
+                  {
+                    amount: amountWei.toString(),
+                    tokenAddress:
+                      "0x0000000000000000000000000000000000000000" as `0x${string}`,
+                    _id: `deposit-${Date.now()}`,
+                  },
+                ],
+              };
             }
-            return _userDepositIndices;
-          };
-
-          res = withdrawMultiToken({
-            abi: YoloABIMultiToken,
-            address: process.env
-              .NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS as `0x${string}`,
-            functionName: "withdrawDeposits",
-            args: [
-              {
-                roundId: BigInt(roundId),
-                depositIndices: specialRound.includes(Number(roundId))
-                  ? getUserDepositIndicesSpecialRound()
-                  : userDepositIndices.map((amount, index) => {
-                      return BigInt(index);
-                    }),
-              },
-            ],
+            return p;
           });
         } else {
-          toast.error("Invalid contract address");
-          return;
-        }
-      } else {
-        // old contract address
-        res = writeContractAsync({
-          abi: YoloABI,
-          address: process.env.NEXT_PUBLIC_KURO_ADDRESS as `0x${string}`,
-          functionName: "withdrawDeposits",
-          args: [
+          // New player, create a new participants array with the new player added
+          newParticipants = [
+            ...prevData.participants,
             {
-              roundId: BigInt(roundId),
-              depositIndices: userDepositIndices.map((amount, index) =>
-                BigInt(index),
-              ),
+              address,
+              deposits: [
+                {
+                  amount: amountWei.toString(),
+                  tokenAddress:
+                    "0x0000000000000000000000000000000000000000" as `0x${string}`,
+                  _id: `deposit-${Date.now()}`,
+                },
+              ],
+              _id: `participant-${Date.now()}`,
             },
-          ],
-        });
-      }
+          ];
+        }
 
-      toast
-        .promise(res, {
-          pending: "Withdraw processing..",
-          success: "Withdraw Success. 👌",
-          error: "Withdraw failed. 🤯",
-        })
-        .then((txHash) => {
-          updateSupportedTokens();
-          _claimKuroRound
-            .mutateAsync({
-              roundId: roundId,
-              txHash: txHash,
-            })
-            .then(() => {
-              refetchHistories();
-            });
-        });
-    } catch (error) {
-      console.error("Error withdraw prizes:", error);
-      toast.error("Failed to withdraw prizes");
+        const newTotalValue = (
+          BigInt(prevData.totalValue) + amountWei
+        ).toString();
+
+        return {
+          ...prevData,
+          participants: newParticipants,
+          totalValue: newTotalValue,
+        };
+      });
+
+      const mockHash = `0x${[...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+      toast.success("Deposit successful!");
+      return mockHash;
+    } catch (e) {
+      toast.error("Deposit failed!");
+      return null;
     }
   };
 
-  const refetchHistories = async (
-    page?: number,
-    limit?: number,
-    type?: "all" | "youWin",
-  ) => {
-    if (type === "all" || !type) {
-      const allHistoriesData = await mutateAsyncHistory({
-        page: page,
-        type: "all",
-        limit: limit,
-      });
-
-      if (allHistoriesData.success) {
-        setAllHistories(allHistoriesData);
-      }
-    }
-
-    if (type === "youWin" || !type) {
-      const myWinHistoriesData = await mutateAsyncHistory({
-        page: page,
-        type: "youWin",
-        limit: limit,
-        address: address,
-      });
-
-      if (myWinHistoriesData.success) {
-        setMyWinHistories(myWinHistoriesData);
-      }
-    }
-  };
-
-  const refetchJackpotHistories = async (
-    page?: number,
-    limit?: number,
-    type?: "all" | "youWin",
-  ) => {
-    if (type === "all" || !type) {
-      const allJackpotHistoriesData = await mutateAsyncJackpotHistory({
-        page: page,
-        type: "all",
-        limit: limit,
-      });
-
-      if (allJackpotHistoriesData.success) {
-        setAllJackpotHistories(allJackpotHistoriesData);
-      }
-    }
-
-    if (type === "youWin" || !type) {
-      const myJackpotHistoriesData = await mutateAsyncJackpotHistory({
-        page: page,
-        type: "youWin",
-        limit: limit,
-        address: address,
-      });
-
-      if (myJackpotHistoriesData.success) {
-        setMyJackpotHistories(myJackpotHistoriesData);
-      }
-    }
-  };
-
-  const handleWinnerAnnounced = useCallback(
-    (eventData: KuroWinnerAnnounced) => {
-      console.log("Winner announced event received:", eventData);
-
-      const { data } = eventData;
-      const roundId = Number(data.roundId);
-
-      // Lưu thông tin người thắng
-      setWinnerData({
-        roundId: roundId,
-        winner: data.winner,
-        drawnAt: data.drawnAt,
-        totalValue: data.totalValue,
-        participants: data.participants || [],
-      });
-
-      setPoolStatus(PoolStatus.SPINNING);
-    },
-    [],
+  return (
+    <KuroContext.Provider
+      value={{
+        kuroData,
+        winnerData,
+        poolStatus,
+        setPoolStatus,
+        addEntry,
+        updateGameData,
+        refetchCounter,
+        triggerRefetch,
+        registerKuroListener,
+        unRegisterKuroListener,
+        handleClaimPrizes,
+        refetchHistories,
+        isFetchingKuroHistory,
+        allHistories,
+        myWinHistories,
+        handleWithdraw,
+        refetchJackpotHistories,
+        isFetchingJackpotHistory,
+        allJackpotHistories,
+        myJackpotHistories,
+      }}
+    >
+      {children}
+    </KuroContext.Provider>
   );
-
-  const handleKuroUpdate = useCallback(
-    (data: KuroData) => {
-      console.log("Received Kuro update:", data);
-
-      // SPINNING or SHOWING_WINNER
-      if (
-        poolStatus === PoolStatus.SPINNING ||
-        poolStatus === PoolStatus.SHOWING_WINNER
-      ) {
-        console.log(
-          "Ignoring kuroUpdate due to SPINNING or SHOWING_WINNER state",
-        );
-        return;
-      }
-
-      if (data.error && data.error === "No data available") {
-        // console.log(
-        //   `Ignoring kuroUpdate with no data available for round ${data.roundId}`,
-        // );
-        // resetStates();
-        return;
-      } else {
-        setKuroData({
-          ...data,
-          endTime: data.endTime - TimeEnum._5SECS / 1000,
-        });
-
-        // DRAWING
-        if (
-          data.startTime > 0 &&
-          data.endTime > 0 &&
-          data.endTime - Date.now() / 1000 < 0
-        ) {
-          setPoolStatus(PoolStatus.DRAWING_WINNER);
-          return;
-        }
-
-        // OPEN FOR DEPOSIT
-        if (data.startTime === 0 && data.endTime === 0) {
-          setPoolStatus(PoolStatus.WAIT_FOR_FIST_DEPOSIT);
-        }
-
-        // DEPOSIT_IN_PROGRESS
-        if (data.startTime > 0 && data.endTime > 0) {
-          setPoolStatus(PoolStatus.DEPOSIT_IN_PROGRESS);
-        }
-      }
-    },
-    [poolStatus, setKuroData, setPoolStatus],
-  );
-
-  const registerKuroListener = useCallback(() => {
-    if (!socket) return;
-
-    registerSocketListener("kuroUpdate", handleKuroUpdate);
-    registerSocketListener("winnerAnnounced", handleWinnerAnnounced);
-  }, [socket]);
-
-  const unRegisterKuroListener = useCallback(() => {
-    if (!socket) return;
-
-    unRegisterSocketListener("kuroUpdate", handleKuroUpdate);
-    unRegisterSocketListener("winnerAnnounced", handleWinnerAnnounced);
-  }, [socket]);
-
-  useEffect(() => {
-    const allHistoriesData = mutateAsyncHistory({
-      page: 1,
-      type: "all",
-      limit: 10,
-    });
-
-    const myWinHistoriesData = mutateAsyncHistory({
-      page: 1,
-      type: "youWin",
-      limit: 10,
-    });
-
-    const allJackpotHistoriesData = mutateAsyncJackpotHistory({
-      page: 1,
-      type: "all",
-      limit: 10,
-    });
-
-    const myJackpotHistoriesData = mutateAsyncJackpotHistory({
-      page: 1,
-      type: "youWin",
-      limit: 10,
-    });
-
-    allJackpotHistoriesData.then((res) => {
-      if (res.success) {
-        setAllJackpotHistories(res);
-      }
-    });
-
-    myJackpotHistoriesData.then((res) => {
-      if (res.success) {
-        setMyJackpotHistories(res);
-      }
-    });
-
-    allHistoriesData.then((res) => {
-      if (res.success) {
-        setAllHistories(res);
-      }
-    });
-
-    myWinHistoriesData.then((res) => {
-      if (res.success) {
-        setMyWinHistories(res);
-      }
-    });
-  }, []);
-
-  // Context value
-  const value: KuroContextProps = {
-    kuroData,
-    winnerData,
-    formatEther,
-    handleClaimPrizes,
-    handleWithdraw,
-    allHistories,
-    myWinHistories,
-    refetchHistories,
-    poolStatus,
-    setPoolStatus,
-    isFetchingKuroHistory,
-    allJackpotHistories,
-    myJackpotHistories,
-    refetchJackpotHistories,
-    isFetchingJackpotHistory,
-    registerKuroListener,
-    unRegisterKuroListener,
-  };
-
-  return <KuroContext.Provider value={value}>{children}</KuroContext.Provider>;
 };
 
-// Hook để sử dụng context
-export const useKuro = (): KuroContextProps => {
-  const context = useContext(KuroContext);
-  if (context === undefined) {
-    throw new Error("useKuro must be used within a KuroProvider");
-  }
-  return context;
-};
+export const useKuro = () => useContext(KuroContext);
