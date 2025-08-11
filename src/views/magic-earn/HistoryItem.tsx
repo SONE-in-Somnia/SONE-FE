@@ -34,11 +34,13 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   const { handleClaimPrizes } = useKuro();
 
   const claim = async (round: Round) => {
-    await handleClaimPrizes(
-      round.roundId,
-      round.participants.map((p) => getTotalUserEntries(round, p.address)),
-      round.kuroContractAddress,
-    );
+    if (round.kuroContractAddress) {
+      await handleClaimPrizes(
+        round.roundId,
+        round.participants.map((p) => getTotalUserEntries(round, p.address)),
+        round.kuroContractAddress,
+      );
+    }
   };
 
   return (
@@ -66,7 +68,14 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
         (history?.participants?.length === 1 ? (
           <WithdrawButton round={history} className="mt-3 w-full" />
         ) : (
-          <Button className="mt-3 w-full" onClick={() => claim(history)}>
+          <Button
+            className="mt-3 w-full"
+            onClick={() => {
+              if (history.kuroContractAddress) {
+                claim(history);
+              }
+            }}
+          >
             Claim
           </Button>
         ))}

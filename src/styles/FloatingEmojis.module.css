@@ -1,0 +1,35 @@
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-30px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(-60px) rotate(180deg);
+  }
+  75% {
+    transform: translateY(-30px) rotate(270deg);
+  }
+}
+
+
+.emojiContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 15;
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.emoji {
+  position: absolute;
+  font-size: 2rem;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+  animation-name: bounce;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+}

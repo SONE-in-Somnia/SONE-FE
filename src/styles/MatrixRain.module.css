@@ -1,0 +1,33 @@
+/* The main container for the matrix effect */
+.matrixBackground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Ensures streams that go off-screen are hidden */
+    z-index: 10; /* Places the background above other content */
+    background-color: transparent; /* Make background transparent */
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+/* Individual stream of falling characters */
+.stream {
+    position: absolute;
+    top: -100%; /* Start above the screen */
+    color: #00ff41; /* Bright green color */
+    font-size: 20px;
+    white-space: nowrap; /* Prevents the vertical text from wrapping */
+    user-select: none; /* Prevents text selection */
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/* Keyframes for the falling animation */
+@keyframes fall {
+    to {
+        /* Move the stream to the bottom of the viewport */
+        transform: translateY(200vh);
+    }
+}

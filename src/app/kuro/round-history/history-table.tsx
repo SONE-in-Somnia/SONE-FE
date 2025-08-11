@@ -76,11 +76,16 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
   const { address } = useAppKitAccount();
 
   const claim = async (round: Round) => {
-    await handleClaimPrizes(
-      round.roundId,
-      round.participants.map((idx) => getTotalUserEntries(round, idx.address)),
-      round.kuroContractAddress,
-    );
+    if (round.kuroContractAddress) {
+      await handleClaimPrizes(
+        round.roundId,
+        round.participants.map((idx) => getTotalUserEntries(round, idx.address)),
+        round.kuroContractAddress,
+      );
+    } else {
+      console.error("kuroContractAddress is undefined for round:", round.roundId);
+      // Optionally, show a toast notification to the user
+    }
   };
 
   useEffect(() => {

@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start -p 2342",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed:twitter": "node scripts/seed-twitter-cache.mts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -39,6 +41,7 @@
     "@tanstack/react-table": "^8.21.2",
     "@types/three": "^0.173.0",
     "@vercel/og": "^0.6.5",
+    "@wagmi/chains": "^1.8.0",
     "axios": "^1.7.9",
     "chart.js": "^4.4.8",
     "class-variance-authority": "^0.7.1",
@@ -72,18 +75,17 @@
     "wagmi": "^2.14.12"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "cross-env": "^7.0.3",
-    "eslint": "^9",
-    "eslint-config-next": "15.1.6",
+    "dotenv": "^17.2.1",
     "postcss": "^8",
     "prettier": "^3.5.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"

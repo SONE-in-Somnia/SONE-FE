@@ -22,7 +22,7 @@ import Cookies from "js-cookie";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { getCookie, setCookie, deleteCookie } from "@/utils/cookie";
 import axiosInstance from "@/lib/axios";
-import { somniaTestnet } from "wagmi/chains";
+import { somniaTestnet } from "@/config/chains";
 import { convertWeiToEther } from "@/utils/string";
 import { YoloABIMultiToken } from "@/abi/YoloABI";
 import { SupportedTokenInfo } from "@/types/round";

@@ -20,7 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { somniaTestnet } from "viem/chains";
+import { somniaTestnet } from "@/config/chains";
 import Image from "next/image";
 import {
   calculateWinChance,

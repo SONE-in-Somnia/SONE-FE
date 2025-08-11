@@ -1,0 +1,20 @@
+@font-face {
+font-family: 'PixelOperatorMono';
+src: *url*('/fonts/PixelOperatorMono.ttf') *format*('truetype');
+}
+
+@font-face {
+font-family: 'PixelOperatorMono'
+src: *url*('/fonts/PixelOperatorMono.ttf') *format*('truetype');
+}
+
+@font-face {
+font-family: 'PixelOperatorMonoBold';
+src: *url*('/fonts/PixelOperatorMono8-Bold.ttf') *format*('truetype');
+
+}
+
+@font-face {
+  font-family: 'ModernWarfare';
+  src: url('/fonts/MODERNWARFARE.ttf') format('truetype');
+}

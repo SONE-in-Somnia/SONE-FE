@@ -16,7 +16,7 @@ import { useSearchParams } from "next/navigation";
 const KuroJackpotTable = () => {
   const [typeSelected, setTypeSelected] = useState<"Kuro" | "Jackpot">("Kuro");
   const searchParams = useSearchParams();
-  const type = searchParams.get("type");
+  const type = searchParams?.get("type");
   useEffect(() => {
     console.log(type);
 
