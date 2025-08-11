@@ -20,7 +20,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import RoundHistory from "@/views/wheely-wheely/RoundHistory";
+import RoundHistory from "@/views/magic-earn/RoundHistory";
 
 const WheelPanelWithProvider = () => {
   const { players, isLoading } = useGetWheelyWheelyPlayers();

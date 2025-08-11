@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, ChevronsDown } from "lucide-react";
 import { SupportedTokenInfo } from "@/types/round";
 import { ERC20ABI } from "@/abi/ERC20ABI";
 import { Switch } from "@/components/ui/switch";
@@ -373,7 +373,9 @@ const WheelyDepositPanel = () => {
                     : 0}
                 </span>
               </div>
-              {/* <ChevronsUpDown className="h-4 w-4 text-muted-foreground" /> */}
+              {/* <ChevronsUpDown className="h-3 w-3 text-muted-foreground" /> */}
+              <ChevronsDown className="h-3 w-3 text-muted-foreground" />
+
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex flex-col gap-2 bg-transparent border-retro-black rounded-none"
               align="start"

@@ -454,7 +454,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                   cy="50"
                   r="45"
                   fill="none"
-                  stroke="#fff13f"
+                  stroke="#fff"
                   strokeWidth="2"
                   strokeDasharray="5 2" // Tạo hiệu ứng dashed
                   clipPath="url(#circleClip)"
@@ -524,7 +524,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                   {
                     "& .MuiPieArc-root": {
                       stroke: "black",
-                      strokeWidth: 2,
+                      strokeWidth: 1,
                     }
                   }
                 }
