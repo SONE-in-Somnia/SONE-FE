@@ -10,22 +10,11 @@ import {
 import { Card } from "@/components/ui/card";
 import HistoryTable from "@/app/kuro/round-history/history-table";
 import { useEffect, useState } from "react";
-import JackpotHistoryTable from "./JackpotHistoryTable";
 import { useSearchParams } from "next/navigation";
 
 const KuroJackpotTable = () => {
   const [typeSelected, setTypeSelected] = useState<"Kuro" | "Jackpot">("Kuro");
-  const searchParams = useSearchParams();
-  const type = searchParams.get("type");
-  useEffect(() => {
-    console.log(type);
 
-    if (type === "jackpot") {
-      setTypeSelected("Jackpot");
-    } else {
-      setTypeSelected("Kuro");
-    }
-  }, [type]);
   return (
     <div className="flex flex-col gap-4">
       <Tabs defaultValue="all">
@@ -45,7 +34,7 @@ const KuroJackpotTable = () => {
               <div className="flex flex-col gap-1 text-start font-medium">
                 <span className="text-xs">Type: {typeSelected}</span>
               </div>
-              <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+              <ChevronsUpDown className="text-muted-foreground h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className="flex flex-col gap-2 bg-[#8371E940] backdrop-blur-md"
@@ -69,15 +58,11 @@ const KuroJackpotTable = () => {
         <TabsContent value="all">
           <Card className="pb-3 shadow-[inset_0px_0px_24px_0px_#8371E980]">
             {typeSelected === "Kuro" && <HistoryTable type="all" />}
-            {typeSelected === "Jackpot" && <JackpotHistoryTable type="all" />}
           </Card>
         </TabsContent>
         <TabsContent value="youWin">
           <Card className="pb-3 shadow-[inset_0px_0px_24px_0px_#8371E980]">
             {typeSelected === "Kuro" && <HistoryTable type="youWin" />}
-            {typeSelected === "Jackpot" && (
-              <JackpotHistoryTable type="youWin" />
-            )}
           </Card>
         </TabsContent>
       </Tabs>

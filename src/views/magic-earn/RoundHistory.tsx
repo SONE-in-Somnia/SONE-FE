@@ -31,25 +31,29 @@ const RoundHistory = () => {
   const [activeTab, setActiveTab] = useState<"all" | "youWin">("all");
 
   useEffect(() => {
-  }, [activeTab, address]);
+    refetchHistories(1, 500, activeTab);
+  }, [address, activeTab]);
+
   const titleComponent = (
     <div className="flex w-full items-center justify-between">
-        <h2 className="text-[16px] font-pixel-operator-mono font-bold">
-          ROUND HISTORY
-        </h2>
-        <DialogClose asChild>
-          <RetroButton className="px-2 py-0 text-sm">
-          &#10006;
-          </RetroButton>
-        </DialogClose>
-      </div>
-    );
+      <h2 className="font-pixel-operator-mono text-[16px] font-bold">
+        ROUND HISTORY
+      </h2>
+      <DialogClose asChild>
+        <RetroButton className="px-2 py-0 text-sm">&#10006;</RetroButton>
+      </DialogClose>
+    </div>
+  );
 
   return (
     <div className="flex h-[600px] items-center justify-center">
-      <Window title={titleComponent} headerClassName="bg-green-700" className="w-[1024px] ">
+      <Window
+        title={titleComponent}
+        headerClassName="bg-green-700"
+        className="w-[1024px]"
+      >
         <div className="h-full w-full p-4">
-          <div className="sticky top-0 flex items-center justify-between text-sm z-10">
+          <div className="sticky top-0 z-10 flex items-center justify-between text-sm">
             <div className="overflow-hidden p-1">
               <div className="relative flex h-full gap-2">
                 <div

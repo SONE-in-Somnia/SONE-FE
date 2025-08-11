@@ -27,7 +27,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
 
   // Safely get the winner and player data
   const winnerAddress = history?.winner;
-  const player = winnerAddress ? findPlayerByAddress(history, winnerAddress) : null;
+  const player = winnerAddress
+    ? findPlayerByAddress(history, winnerAddress)
+    : null;
   const winLeverage = player ? calculateWinLeverage(history, player) : "0.00";
 
   const claim = async (round: Round) => {
@@ -43,48 +45,52 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   };
 
   return (
-    <RetroPanel headerClassName="bg-gray-700" className="mb-2">
-        <div className="p-2 text-sm text-white">
-            <div className="flex justify-between items-center">
-                <p className="font-bold">Round: #{history.roundId || 'N/A'}</p>
-                {winnerAddress && (
-                    <p className="text-xl text-retro-yellow font-bold">
-                        x{parseFloat(winLeverage).toFixed(2)}
-                    </p>
-                )}
-            </div>
-
-            <div className="mt-2 flex justify-between items-center">
-                <div className="flex flex-col">
-                    <span className="text-xs text-gray-400">Winner</span>
-                    <p className="font-mono">{winnerAddress ? formatEthereumAddress(winnerAddress, 6) : "N/A"}</p>
-                </div>
-                <div className="flex flex-col text-right">
-                    <span className="text-xs text-gray-400">Prize Pool</span>
-                    <p className="font-mono">{convertWeiToEther(history.totalValue || "0")} STT</p>
-                </div>
-            </div>
-
-            {isWinner && (
-                <div className="mt-3 pt-2 border-t border-gray-600">
-                    {!history.winnerClaimed ? (
-                        <Button className="w-full" onClick={() => claim(history)}>
-                            Claim Prize
-                        </Button>
-                    ) : (
-                        <Link
-                            target="_blank"
-                            href={`https://shannon-explorer.somnia.network/tx/${history.txClaimed}`}
-                            className="w-full"
-                        >
-                            <Button className="w-full underline" disabled>
-                                Claimed: {formatEthereumAddress(history.txClaimed, 6)}
-                            </Button>
-                        </Link>
-                    )}
-                </div>
-            )}
+    <RetroPanel title="" headerClassName="bg-gray-700" className="mb-2">
+      <div className="p-2 text-sm text-white">
+        <div className="flex items-center justify-between">
+          <p className="font-bold">Round: #{history.roundId || "N/A"}</p>
+          {winnerAddress && (
+            <p className="text-xl font-bold text-retro-yellow">
+              x{parseFloat(winLeverage.toString()).toFixed(2)}
+            </p>
+          )}
         </div>
+
+        <div className="mt-2 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-400">Winner</span>
+            <p className="font-mono">
+              {winnerAddress ? formatEthereumAddress(winnerAddress) : "N/A"}
+            </p>
+          </div>
+          <div className="flex flex-col text-right">
+            <span className="text-xs text-gray-400">Prize Pool</span>
+            <p className="font-mono">
+              {convertWeiToEther(history.totalValue || "0")} STT
+            </p>
+          </div>
+        </div>
+
+        {isWinner && (
+          <div className="mt-3 border-t border-gray-600 pt-2">
+            {!history.winnerClaimed ? (
+              <Button className="w-full" onClick={() => claim(history)}>
+                Claim Prize
+              </Button>
+            ) : (
+              <Link
+                target="_blank"
+                href={`https://shannon-explorer.somnia.network/tx/${history.txClaimed}`}
+                className="w-full"
+              >
+                <Button className="w-full underline" disabled>
+                  Claimed: {formatEthereumAddress(history.txClaimed)}
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
     </RetroPanel>
   );
 };

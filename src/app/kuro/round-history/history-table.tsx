@@ -76,11 +76,11 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
   const { address } = useAppKitAccount();
 
   const claim = async (round: Round) => {
-      await handleClaimPrizes(
-        round.roundId,
-        round.participants.map((idx) => getTotalUserEntries(round, idx.address)),
-        round.kuroContractAddress,
-      );
+    await handleClaimPrizes(
+      round.roundId,
+      round.participants.map((idx) => getTotalUserEntries(round, idx.address)),
+      round.kuroContractAddress,
+    );
   };
 
   useEffect(() => {
@@ -135,7 +135,7 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
                   key={round.roundId}
                   className="transition hover:bg-[#3F367559]"
                 >
-                  <TableCell className="py-4 font-bold text-gray">
+                  <TableCell className="text-gray py-4 font-bold">
                     <div className="flex items-center justify-center">
                       {round.roundId}
                       {round.kuroContractAddress && (
@@ -146,7 +146,7 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
                                 <IconChevronsUp size={14} />
                               </div>
                             </TooltipTrigger>
-                            <TooltipContent className="border-gray-800 max-w-md rounded-lg border bg-black/95 p-4 text-white shadow-lg backdrop-blur-sm">
+                            <TooltipContent className="max-w-md rounded-lg border border-gray-800 bg-black/95 p-4 text-white shadow-lg backdrop-blur-sm">
                               <p>
                                 This is the round using the new contract that
                                 supports multi-tokens.
@@ -200,7 +200,7 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
                     </div>
                   </TableCell>
                   <TableCell className="py-4">
-                    <div className="w-fit rounded-[6px] bg-accept/15 px-2 py-1 font-medium text-accept">
+                    <div className="bg-accept/15 text-accept w-fit rounded-[6px] px-2 py-1 font-medium">
                       x
                       {calculateWinLeverage(
                         round,
@@ -225,7 +225,7 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex items-center gap-1">
-                      <p className="font-medium text-gray">
+                      <p className="text-gray font-medium">
                         {convertTimestampToDateTime(round.endTime)} (UTC)
                       </p>
                     </div>
@@ -288,7 +288,7 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
               <TableRow>
                 <TableCell
                   colSpan={type === "youWin" ? 9 : 8}
-                  className="text-gray-500 h-24 text-center text-sm"
+                  className="h-24 text-center text-sm text-gray-500"
                 >
                   No data
                 </TableCell>
@@ -299,7 +299,7 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
       </div>
 
       <div className="flex items-center justify-end px-4 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex-1 text-sm">
           <p>
             Page {page} / {totalPages || 1} - Total {roundHistory.length}{" "}
             results

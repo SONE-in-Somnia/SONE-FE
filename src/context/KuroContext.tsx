@@ -114,14 +114,6 @@ interface KuroContextProps {
     type?: "all" | "youWin",
   ) => Promise<void>;
   isFetchingKuroHistory: boolean;
-  allJackpotHistories: RoundHistoryResponse<JackpotRound> | null;
-  myJackpotHistories: RoundHistoryResponse<JackpotRound> | null;
-  refetchJackpotHistories: (
-    page?: number,
-    limit?: number,
-    type?: "all" | "youWin",
-  ) => Promise<void>;
-  isFetchingJackpotHistory: boolean;
   registerKuroListener: () => void;
   unRegisterKuroListener: () => void;
 }
@@ -322,8 +314,8 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
                 depositIndices: specialRound.includes(Number(roundId))
                   ? getUserDepositIndicesSpecialRound()
                   : userDepositIndices.map((amount, index) => {
-                    return BigInt(index);
-                  }),
+                      return BigInt(index);
+                    }),
               },
             ],
           });
@@ -532,30 +524,6 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
       limit: 10,
     });
 
-    const allJackpotHistoriesData = mutateAsyncJackpotHistory({
-      page: 1,
-      type: "all",
-      limit: 10,
-    });
-
-    const myJackpotHistoriesData = mutateAsyncJackpotHistory({
-      page: 1,
-      type: "youWin",
-      limit: 10,
-    });
-
-    allJackpotHistoriesData.then((res) => {
-      if (res.success) {
-        setAllJackpotHistories(res);
-      }
-    });
-
-    myJackpotHistoriesData.then((res) => {
-      if (res.success) {
-        setMyJackpotHistories(res);
-      }
-    });
-
     allHistoriesData.then((res) => {
       if (res.success) {
         setAllHistories(res);
@@ -582,10 +550,6 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
     poolStatus,
     setPoolStatus,
     isFetchingKuroHistory,
-    allJackpotHistories,
-    myJackpotHistories,
-    refetchJackpotHistories,
-    isFetchingJackpotHistory,
     registerKuroListener,
     unRegisterKuroListener,
   };

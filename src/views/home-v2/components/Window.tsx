@@ -19,27 +19,27 @@ const Window: React.FC<WindowProps> = ({
   return (
     <div
       className={cn(
-        "border-r-4 border-r-black border-b-4 border-b-black border-l-2 border-l-white border-t-2 border-t-white h-full flex flex-col font-pixel-operator-mono",
-        className
+        "flex h-full flex-col border-b-4 border-l-2 border-r-4 border-t-2 border-b-black border-l-white border-r-black border-t-white font-pixel-operator-mono",
+        className,
       )}
     >
       <div
         className={cn(
-          "bg-retro-blue text-white p-1 flex justify-between items-center flex-shrink-0",
+          "flex flex-shrink-0 items-center justify-between bg-retro-blue p-1 text-white",
           headerClassName,
-          onTitleClick ? "cursor-pointer" : ""
+          onTitleClick ? "cursor-pointer" : "",
         )}
         onClick={onTitleClick}
       >
         {typeof title === "string" ? (
-          <h2 className="text-[16px] font-pixel-operator-mono font-bold">
+          <h2 className="font-pixel-operator-mono text-[16px] font-bold">
             {title}
           </h2>
         ) : (
           title
         )}
       </div>
-      <div className="bg-retro-gray py-4 px-3 flex-grow overflow-y-auto font-pixel-operator-mono font-thin h-full">
+      <div className="h-full flex-grow overflow-y-auto bg-retro-gray px-3 py-4 font-pixel-operator-mono font-thin">
         {children}
       </div>
     </div>

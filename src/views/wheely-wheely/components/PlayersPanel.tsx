@@ -16,7 +16,7 @@ const PlayersPanel = () => {
       title="PLAYERS"
       headerClassName="bg-green-700"
       headerContent={
-        <span className="text-white text-sm">{players.length}/100</span>
+        <span className="text-sm text-white">{players.length}/100</span>
       }
     >
       <div className="flex flex-col gap-2 text-white">
@@ -38,7 +38,7 @@ const PlayersPanel = () => {
               {formatEther(
                 player.deposits.reduce(
                   (acc, d) => acc + BigInt(d.amount),
-                  0n,
+                  BigInt(0),
                 ),
               )}{" "}
               STT
