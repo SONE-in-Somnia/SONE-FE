@@ -50,13 +50,6 @@ export interface KinpuParticipant {
     _id: string;
   }
 
-  export interface KuroData {
-    roundId: number;
-    participants: KuroParticipant[];
-    totalValue: string;
-    startTime: number;
-    endTime: number;
-  }
   
   export interface KinpuData {
     roundId: number;

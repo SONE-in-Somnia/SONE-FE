@@ -38,15 +38,13 @@ const WithdrawButton: React.FC<WithdrawButtonProps> = ({
 
   return (
     <Button
-      onClick={() => {
-        if (round?.kuroContractAddress) {
-          handleWithdraw(
-            round.roundId,
-            getDeposits(round),
-            round.kuroContractAddress,
-          );
-        }
-      }}
+      onClick={() =>
+        handleWithdraw(
+          round.roundId,
+          getDeposits(round),
+          round?.kuroContractAddress,
+        )
+      }
       className={className}
     >
       {label}

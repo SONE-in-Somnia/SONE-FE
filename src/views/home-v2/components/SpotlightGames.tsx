@@ -3,7 +3,7 @@
 import React from "react";
 import Window from "./Window";
 import Image from "next/image";
-import { RetroButton } from "@/components/RetroButton";
+import {  RetroButton } from "@/components/RetroButton";
 import styles from "../../../styles/SpotlightGames.module.css";
 import { useRouter } from "next/navigation";
 

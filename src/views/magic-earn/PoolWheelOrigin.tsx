@@ -27,7 +27,7 @@ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface RandomWheelProps {
+interface RandomWheelProps { 
   size?: number;
 }
 
@@ -104,7 +104,7 @@ const getTotalEntriesByTokenAddress = (
         mapToken.set(
           deposit.tokenAddress,
           (mapToken.get(deposit.tokenAddress) || 0) +
-            Number(convertWeiToEther(deposit.amount)),
+          Number(convertWeiToEther(deposit.amount)),
         );
       } else {
         mapToken.set(
@@ -261,27 +261,20 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
     return data;
   };
 
-  const updateTimer = useCallback(() => {
+  const updateTimer = async () => {
     if (kuroData?.startTime && kuroData.endTime) {
-      const now = new Date().getTime(); // Use milliseconds
-      const startTime = kuroData.startTime;
-      const endTime = kuroData.endTime;
+      const now = new Date().getTime() / 1000;
 
-      if (now >= endTime) {
+      const rangeTime = kuroData?.endTime - kuroData.startTime;
+      const process = now - kuroData?.startTime;
+
+      if (process > rangeTime) {
         setProgress(0);
-        return;
-      }
-      
-      const totalDuration = endTime - startTime;
-      const elapsedTime = now - startTime;
-      
-      if (totalDuration > 0) {
-        setProgress(1 - (elapsedTime / totalDuration));
       } else {
-        setProgress(0);
+        setProgress(1 - process / rangeTime);
       }
     }
-  }, [kuroData]);
+  };
 
   useEffect(() => {
     if (!kuroData) return;
@@ -315,7 +308,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
     ) {
       return;
     } else if (poolStatus === PoolStatus.DEPOSIT_IN_PROGRESS) {
-      interval = setInterval(updateTimer, 100); // Update more frequently for smoother animation
+      interval = setInterval(updateTimer, 10);
     } else if (poolStatus === PoolStatus.SPINNING && winnerData) {
       spinWheel(winnerData.winner);
     } else if (poolStatus === PoolStatus.SHOWING_WINNER) {
@@ -331,7 +324,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
         clearTimeout(timeOut);
       }
     };
-  }, [poolStatus, winnerData, updateTimer]);
+  }, [poolStatus, winnerData]);
 
   useEffect(() => {
     if (isYouAreWinner) {
@@ -343,22 +336,6 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
 
   return (
     <>
-      <style>
-        {`
-          .MuiCharts-tooltip-root * {
-            font-family: var(--font-pixel-operator) !important;
-          }
-          .MuiCharts-tooltip-root {
-            font-family: var(--font-pixel-operator) !important;
-          }
-          .MuiPieArc-root {
-            filter: drop-shadow(3px 9px 0px rgba(0, 0, 0, 0.75));
-          }
-          .pool-wheel-custom, .MuiPieChart-root, .MuiPieChart-root svg {
-            overflow: visible !important;
-          }
-        `}
-      </style>
       {isYouAreWinner && (
         <div className="fixed left-0 top-0 z-[100] grid h-screen w-screen place-items-center bg-black/40 backdrop-blur-sm">
           <div className="show-winner-animate flex flex-col items-center justify-center gap-4">
@@ -413,10 +390,11 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
             margin: "0 auto",
             textAlign: "center",
             position: "relative",
+            padding: "20px",
           }}
-          className="w-full overflow-visible"
+          className="w-fit"
         >
-          <div className="relative h-full w-full rounded-full overflow-visible">
+          <div className="relative h-fit w-fit rounded-full p-3">
             <Image
               src={"/images/arrow.svg"}
               alt="arrow"
@@ -427,14 +405,14 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
               {(poolStatus === PoolStatus.DEPOSIT_IN_PROGRESS ||
                 poolStatus === PoolStatus.WAIT_FOR_FIST_DEPOSIT) && (
-                <>
-                  <p className="text-center">STT</p>
-                  <p className="text-center font-gajraj text-[52px] leading-[52px]">
-                    {formatEther(kuroData?.totalValue || "0")}
-                  </p>
-                  <p className="text-center opacity-50">Deposited</p>
-                </>
-              )}
+                  <>
+                    <p className="text-center">STT</p>
+                    <p className="text-center font-gajraj text-[52px] leading-[52px]">
+                      {formatEther(kuroData?.totalValue || "0")}
+                    </p>
+                    <p className="text-center opacity-50">Deposited</p>
+                  </>
+                )}
 
               {poolStatus === PoolStatus.DRAWING_WINNER && (
                 <>
@@ -456,8 +434,8 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                 </>
               )}
             </div>
-            <div className="absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rotate-90 rounded-full">
-              <svg className="h-full w-full !overflow-visible" >
+            <div className="absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rotate-90">
+              <svg className="h-full w-full" viewBox="0 0 100 100">
                 <defs>
                   <clipPath id="circleClip">
                     <path
@@ -497,7 +475,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                 height: `${size}px`,
                 transformOrigin: "center center",
               }}
-              className="pool-wheel-custom rounded-full overflow-visible"
+              className="pool-wheel-custom"
             >
               <PieChart
                 series={[
@@ -511,18 +489,18 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                     data:
                       mapToData(pool).length > 0
                         ? mapToData(pool).map((d, index) => ({
-                            label: formatEthereumAddress(d.label),
-                            id: d.label,
-                            value: Number(d.value),
-                            color: colors[index % colors.length],
-                          }))
+                          label: formatEthereumAddress(d.label),
+                          id: d.label,
+                          value: Number(d.value),
+                          color: colors[index % colors.length],
+                        }))
                         : [
-                            {
-                              label: "No Data",
-                              id: "no-data",
-                              value: 1,
-                            },
-                          ],
+                          {
+                            label: "No Data",
+                            id: "no-data",
+                            value: 1,
+                          },
+                        ],
 
                     valueFormatter: (value: { value: number }) => {
                       return mapToData(pool).length > 0
@@ -542,7 +520,14 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                 width={size}
                 height={size}
                 legend={{ hidden: true }}
-
+                sx={
+                  {
+                    "& .MuiPieArc-root": {
+                      stroke: "black",
+                      strokeWidth: 2,
+                    }
+                  }
+                }
               />
             </div>
           </div>
