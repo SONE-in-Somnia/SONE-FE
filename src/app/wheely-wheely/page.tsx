@@ -19,6 +19,7 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import RoundHistory from "@/views/magic-earn/RoundHistory";
 
@@ -66,6 +67,7 @@ const WheelPanelWithProvider = () => {
           {/* Right Column (Main content) */}
           <div className="relative col-span-8 flex items-center justify-center">
             <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+              <DialogTitle></DialogTitle>
               <DialogTrigger asChild>
                 <div className="absolute right-2 top-2 z-10">
                   <HistoryPanel />
