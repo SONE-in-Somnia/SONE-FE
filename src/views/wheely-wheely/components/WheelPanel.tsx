@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import RoundHistory from "../RoundHistory";
 import { useGetWheelyGameData } from "@/api/wheely-wheely/useGetWheelyGameData";
-import DevPanel from "./DevPanel";
+// import DevPanel from "./DevPanel";
 
 
 
@@ -60,7 +60,7 @@ const WheelPanelWithProvider = () => {
               <RoundInfoPanel />
               <InputPanel />
             <PlayersPanel />
-            <DevPanel/>
+            {/* <DevPanel/> */}
             </div>
             {/* Right Column (Main content) */}
             <div className="col-span-8 relative flex items-center justify-center">
