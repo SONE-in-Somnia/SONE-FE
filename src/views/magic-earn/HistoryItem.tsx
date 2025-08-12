@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { RetroButton } from "@/components/RetroButton";
 
 interface HistoryItemProps {
   history: Round;
@@ -34,21 +35,21 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   const { handleClaimPrizes } = useKuro();
 
   const claim = async (round: Round) => {
-    if (round.kuroContractAddress) {
       await handleClaimPrizes(
         round.roundId,
         round.participants.map((p) => getTotalUserEntries(round, p.address)),
         round.kuroContractAddress,
       );
-    }
   };
 
   return (
-    <div className="relative min-w-[190px] items-center justify-between rounded-md bg-background px-4 py-3">
-      <div className="flex flex-col gap-2">
+    <div className="relative flex flex-col items-center justify-between bg-background px-4 py-3 ring-4 ring-retro-black/20 ">
+      <div className="flex gap-20 items-center">
         <p>
           <span className="font-medium">Round: #{history.roundId}</span>
         </p>
+        
+        <p className="font-medium underline underline-offset-4">{formatEthereumAddress(history?.winner)}</p>
         <p className="text-xl text-[#9C63FA]">
           x{" "}
           {calculateWinLeverage(
@@ -56,7 +57,6 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
             findPlayerByAddress(history, history.winner),
           )}
         </p>
-        <p className="font-medium">{formatEthereumAddress(history?.winner)}</p>
 
         <div className="flex items-center justify-between gap-1 font-medium">
           <div className="">Pool win</div>
@@ -68,16 +68,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
         (history?.participants?.length === 1 ? (
           <WithdrawButton round={history} className="mt-3 w-full" />
         ) : (
-          <Button
-            className="mt-3 w-full"
-            onClick={() => {
-              if (history.kuroContractAddress) {
-                claim(history);
-              }
-            }}
-          >
+          <RetroButton className="mt-3 w-full" onClick={() => claim(history)}>
             Claim
-          </Button>
+          </RetroButton>
         ))}
 
       {isWinner && history?.winnerClaimed && (
@@ -94,9 +87,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
             href={`https://shannon-explorer.somnia.network/tx/${history.txClaimed}`}
             className="w-full"
           >
-            <Button className="mt-3 w-full underline">
+            <RetroButton className="mt-3 w-full underline">
               {formatEthereumAddress(history.txClaimed)}
-            </Button>
+            </RetroButton>
           </Link>
         </div>
       )}

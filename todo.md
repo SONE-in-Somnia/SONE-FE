@@ -1,36 +1,13 @@
-# Wheely Wheely Feature Implementation Plan
+# Todo - Integrate Wheely Wheely UI into Kuro Page
 
-This document outlines the tasks required to implement the "Wheely Wheely" game feature, based on the provided UI design.
-
-## Phase 1: Scaffolding and Basic Structure
-
-- [x] Create the main page file at `src/app/wheely-wheely/page.tsx`.
-- [x] Implement the basic three-column layout using Tailwind CSS.
-- [x] Create a `WheelyWheelyContext` at `src/context/wheely-wheely/WheelyWheelyContext.tsx` to manage game state. (Later removed in favor of wagmi hooks).
-- [x] Create placeholder components for each of the main UI panels.
-
-## Phase 2: Core Component Development
-
-- [x] Develop the `RetroPanel` component for consistent container styling. (Reused `Window` component instead).
-- [x] Implement the "Input Your Entry" panel component.
-- [x] Implement the "Players" panel component.
-- [x] Build the "Wheel of Fortune" visual component.
-  - [x] Integrate `@mui/x-charts` to render the player shares.
-  - [x] Use the `NumberCounter` component for the total pot display.
-
-## Phase 3: Web3 and State Integration
-
-- [x] Integrate the `WheelyWheelyContext` with the main page.
-- [x] Create `useSubmitWheelyEntry.ts` hook for handling the deposit logic.
-- [x] Create `useGetWheelyWheelyPlayers.ts` hook to fetch the player list.
-- [x] Connect the `useSubmitWheelyEntry` hook to the "SUBMIT" button.
-- [x] Fetch and display real-time data using the `useGetWheelyWheelyPlayers` hook.
-- [ ] Implement real-time updates using the `SocketContext`.
-- [x] Add a `useGetWheelyWheelyHistory` hook and a corresponding view for the "View History" button.
-
-## Phase 4: Finalization and Review
-
-- [ ] Conduct a final review of the UI to ensure it matches the design.
-- [ ] Test the functionality of the game from end to end (with real contract).
-- [ ] Remove any placeholder code and add final comments.
-- [ ] Merge the `feat/wheely-wheely` branch into the main branch.
+1.  [ ] Wrap the main component in `KuroProvider`.
+2.  [ ] Replace the root element in `kuro/page.tsx` with the `Window` component from `wheely-wheely/page.tsx`.
+3.  [ ] Create a title component for the `Window` with the title "KURO".
+4.  [ ] Implement the two-column grid layout from `wheely-wheely/page.tsx`.
+5.  [ ] Move the existing Kuro components (`RoundState`, `Deposit`, `PoolPlayers`) into the left column.
+6.  [ ] Move `PoolWheelOrigin` into the right column.
+7.  [ ] Implement the `RoundHistory` component within a `Dialog`, triggered by a button, similar to `wheely-wheely/page.tsx`.
+8.  [ ] Apply the background image and styling from `wheely-wheely/page.tsx`.
+9.  [ ] Clean up unused code and imports.
+10. [ ] Mark all tasks as complete in this file.
+11. [ ] Add a review section summarizing the changes.

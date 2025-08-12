@@ -89,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {...props}
         >
           <SidebarHeader className="">
-            <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center justify-between px-2 py-2">
               <div className="">
                 <Link href="/" className="flex items-center gap-2">
                     <Image
@@ -147,12 +147,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
                 {isConnected && !isSyncMessage && (
                   <div className="flex gap-2 mt-5">
-                    <Button
+                    {/* <Button
                       className="bg-retro-gray ring-4 ring-retro-black/20 border-r-4 border-r-black border-b-4 border-b-black border-l-2 border-l-white border-t-2 border-t-white p-2 text-left flex items-center space-x-4 hover:bg-gray-400 active:border-l-black active:border-t-black active:border-r-white active:border-b-white"
                       onClick={() => signMessageWithSign()}
                     >
                       Verify Wallet
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outline"
                       size="icon"
@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {isConnected && isSyncMessage && (
                   <Button
                     variant="outline"
-                    className="w-full bg-red-500 text-white hover:bg-red-800"
+                    className="w-full bg-red-500 text-white hover:bg-red-800 mt-5"
                     onClick={() => disconnect()}
                   >
                     Disconnect <LogOut className="ml-1 h-4 w-4" />

@@ -32,6 +32,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IconChevronsUp } from "@tabler/icons-react";
+import { RetroButton } from "@/components/RetroButton";
 
 export const findPlayerByAddress = (
   round: Round,
@@ -76,16 +77,11 @@ const HistoryTable = ({ type = "all" }: { type: "youWin" | "all" }) => {
   const { address } = useAppKitAccount();
 
   const claim = async (round: Round) => {
-    if (round.kuroContractAddress) {
       await handleClaimPrizes(
         round.roundId,
         round.participants.map((idx) => getTotalUserEntries(round, idx.address)),
         round.kuroContractAddress,
       );
-    } else {
-      console.error("kuroContractAddress is undefined for round:", round.roundId);
-      // Optionally, show a toast notification to the user
-    }
   };
 
   useEffect(() => {

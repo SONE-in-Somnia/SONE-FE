@@ -20,7 +20,7 @@ const Window: React.FC<WindowProps> = ({
     <div
       className={cn(
         "border-r-4 border-r-black border-b-4 border-b-black border-l-2 border-l-white border-t-2 border-t-white h-full flex flex-col font-pixel-operator-mono",
-        className
+        className,
       )}
     >
       <div

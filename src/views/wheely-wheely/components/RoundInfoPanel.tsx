@@ -2,15 +2,10 @@
 
 import React from "react";
 import Countdown from "@/components/Countdown";
-import { PoolStatus, useKuro } from "@/context/KuroContext";
+import { useKuro } from "@/context/KuroContext";
 
 const RoundInfoPanel = () => {
-  const { kuroData, setPoolStatus } = useKuro();
-
-  const handleCountdownComplete = () => {
-    console.log("Countdown complete! Starting spin...");
-    setPoolStatus(PoolStatus.SPINNING);
-  };
+  const { kuroData } = useKuro();
 
   return (
     <div className="bg-black border-2 border-retro-pink p-2 text-center">
@@ -18,7 +13,6 @@ const RoundInfoPanel = () => {
         Round #{kuroData?.roundId || 0} - Start in:{" "}
         <Countdown
           endTime={kuroData?.endTime || 0}
-          onComplete={handleCountdownComplete}
         />
       </p>
     </div>

@@ -3,6 +3,7 @@ import Button from "@/components/button";
 import { useKuro } from "@/context/KuroContext";
 import { Round } from "@/types/round";
 import { getTotalUserEntries } from "./RoundHistory";
+import { RetroButton } from "@/components/RetroButton";
 
 interface WithdrawButtonProps {
   round: Round;
@@ -37,20 +38,18 @@ const WithdrawButton: React.FC<WithdrawButtonProps> = ({
   }, [round]);
 
   return (
-    <Button
-      onClick={() => {
-        if (round?.kuroContractAddress) {
-          handleWithdraw(
-            round.roundId,
-            getDeposits(round),
-            round.kuroContractAddress,
-          );
-        }
-      }}
+    <RetroButton
+      onClick={() =>
+        handleWithdraw(
+          round.roundId,
+          getDeposits(round),
+          round?.kuroContractAddress,
+        )
+      }
       className={className}
     >
       {label}
-    </Button>
+    </RetroButton>
   );
 };
 
