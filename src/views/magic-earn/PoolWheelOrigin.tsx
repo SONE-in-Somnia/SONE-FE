@@ -17,79 +17,39 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { convertWeiToEther, formatEthereumAddress } from "@/utils/string";
 import dynamic from "next/dynamic";
 import congratulations from "../../../public/images/congratulations.json";
-import FuzzyText from "@/blocks/TextAnimations/FuzzyText/FuzzyText";
+import MatrixText from "@/components/MatrixText";
 import { KuroParticipant } from "@/types/round";
 import { getUserEntries } from "./TotalPlayer";
 import { useAuth } from "@/context/AuthContext";
+import styles from "@/styles/PoolWheel.module.css";
 
 // Import Lottie chỉ phía client
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface RandomWheelProps { 
+interface RandomWheelProps {
   size?: number;
 }
 
 export const colors = [
-  "#4DFFFF", // Blue neon (từ #33CCFF)
-  "#FF4DFF", // Magenta neon (từ #FF00FF)
-  "#4DFF4D", // Green neon (từ #00FF00)
-  "#FF4DB3", // Ruby neon (từ #FF0077)
-  "#FF80FF", // Bright magenta (từ #FF33FF)
-  "#80FFFF", // Aqua neon (từ #33FFCC)
-  "#FF4DE6", // Deep pink (từ #FF0099)
-  "#4DFFE6", // Mint neon (từ #00FF99)
-  "#FF99FF", // Light magenta (từ #FF66FF)
-  "#99FFFF", // Sky cyan (từ #66FFFF)
-  "#FF4DCC", // Vivid pink (từ #FF0088 // Purple neon (từ #CC00FF)
-  "#4DFF99", // Lime neon (từ #00FF66)
-  "#FF80CC", // Rose neon (từ #FF3399 // Candy pink (từ #FF00AA)
-  "#4DFF80", // Acid green (từ #00FF33)
-  "#FFAAFF", // Pastel magenta (từ #FF55FF)
-  "#AAFFFF", // Pale cyan (từ #55FFFF)
-  "#FF4D99", // Pink neon (từ #FF0066 // Violet neon (từ #AA00FF)
-  "#4DFFAA", // Spring green (từ #00FF55) // Ice cyan (từ #22FFFF)
-  "#FF4D80", // Crimson neon (từ #FF0044)
-  "#4DFFD4", // Jade neon (từ #00FF88)
-  "#FFB3FF", // Lilac neon (từ #FF77FF)
-  "#B3FFFF", // Crystal cyan (từ #77FFFF // Hot pink (từ #FF00CC)
-  "#FF4D80", // Scarlet neon (từ #FF0033) // Turquoise neon (từ #00FFBB)
-  "#FFE6FF", // Bubblegum pink (từ #FF99FF)
-  "#E6FFFF", // Frost cyan (từ #99FFFF)
-  "#FF4D66", // Cherry neon (từ #FF0022) // Lagoon neon (từ #00FFDD)
-  "#FFF0FF", // Lavender neon (từ #FFBBFF)
-  "#F0FFFF", // Mist cyan (từ #BBFFFF)
-  "#FF4D4D", // Blood neon (từ #FF0011) // Ocean neon (từ #00FFEE)
-  "#FFF0FF", // Orchid neon (từ #FFDDFF)
-  "#E6FFE6", // Pale mint (từ #CCFFCC)
-  "#FF4D4D", // Pure red neon (từ #FF0000)
-  "#4DFF66", // Forest neon (từ #00FF11)
-  "#FFF0FF", // Blush neon (từ #FFEEFF)
-  "#F0FFF0", // Ghost mint (từ #EEFFEE)
-  "#FF80AA", // Coral neon (từ #FF0055)
-  "#66FF4D", // Toxic green (từ #11FF00) // Blue neon (từ #33CCFF // Magenta neon (từ #FF00FF) // Bright magenta (từ #FF33FF) // Aqua neon (từ #33FFCC)
-  "#FF4D99", // Pink neon (từ #FF0066 // Violet neon (từ #AA00FF)
-  "#4DFFAA", // Spring green (từ #00FF55) // Flamingo pink (từ #FF22AA) // Cyan neon (từ #00FFFF) // Ice cyan (từ #22FFFF)
-  "#FF4D80", // Crimson neon (từ #FF0044)
-  "#4DFFD4", // Jade neon (từ #00FF88)
-  "#FFB3FF", // Lilac neon (từ #FF77FF)
-  "#B3FFFF", // Crystal cyan (từ #77FFFF // Hot pink (từ #FF00CC)
-  "#FF4D80", // Scarlet neon (từ #FF0033) // Turquoise neon (từ #00FFBB)
-  "#FFE6FF", // Bubblegum pink (từ #FF99FF)
-  "#E6FFFF", // Frost cyan (từ #99FFFF)
-  "#FF4D66", // Cherry neon (từ #FF0022) // Lagoon neon (từ #00FFDD)
-  "#FFF0FF", // Lavender neon (từ #FFBBFF)
-  "#F0FFFF", // Mist cyan (từ #BBFFFF)
-  "#FF4D4D", // Blood neon (từ #FF0011) // Ocean neon (từ #00FFEE)
-  "#FFF0FF", // Orchid neon (từ #FFDDFF)
-  "#E6FFE6", // Pale mint (từ #CCFFCC)
-  "#FF4D4D", // Pure red neon (từ #FF0000)
-  "#4DFF66", // Forest neon (từ #00FF11)
-  "#FFF0FF", // Blush neon (từ #FFEEFF)
-  "#F0FFF0", // Ghost mint (từ #EEFFEE)
-  "#FF80AA", // Coral neon (từ #FF0055)
-  "#66FF4D", // Toxic green (từ #11FF00)
+  // Retro/Pixel Art Color Palette
+  "#FF0000", // Red
+  "#00FF00", // Green
+  "#0000FF", // Blue
+  "#FFFF00", // Yellow
+  "#FF00FF", // Magenta
+  "#00FFFF", // Cyan
+  "#FFA500", // Orange
+  "#800080", // Purple
+  "#FFC0CB", // Pink
+  "#008000", // Dark Green
+  "#800000", // Maroon
+  "#000080", // Navy
+  "#808000", // Olive
+  "#808080", // Gray
+  "#C0C0C0", // Silver
+  "#FFFFFF", // White
 ];
 
 const getTotalEntriesByTokenAddress = (
@@ -104,7 +64,7 @@ const getTotalEntriesByTokenAddress = (
         mapToken.set(
           deposit.tokenAddress,
           (mapToken.get(deposit.tokenAddress) || 0) +
-          Number(convertWeiToEther(deposit.amount)),
+            Number(convertWeiToEther(deposit.amount)),
         );
       } else {
         mapToken.set(
@@ -339,13 +299,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
       {isYouAreWinner && (
         <div className="fixed left-0 top-0 z-[100] grid h-screen w-screen place-items-center bg-black/40 backdrop-blur-sm">
           <div className="show-winner-animate flex flex-col items-center justify-center gap-4">
-            <FuzzyText
-              baseIntensity={0.2}
-              hoverIntensity={2}
-              enableHover={true}
-            >
-              You are the winner!
-            </FuzzyText>
+            <MatrixText text="You are the winner" />
             <Image
               src={"/images/champion.png"}
               width={512}
@@ -363,28 +317,6 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
       )}
 
       <div className="relative text-white">
-        {/* <div className="absolute left-0 top-0 m-6 w-full">
-          {tokenMap.size > 0 && (
-            <p className="text-xs font-medium text-gray">Deposited tokens</p>
-          )}
-          <div className="mt-1 flex flex-col gap-1">
-            {tokenMap.size > 0 &&
-              [...tokenMap.entries()].map(([tokenAddress, totalDeposits]) => (
-                <div key={tokenAddress} className="flex items-center">
-                  <Image
-                    src={"/images/arrow_right.svg"}
-                    alt="arrow"
-                    width={16}
-                    height={16}
-                  />
-                  <p className="text-xs font-semibold">
-                    ${getTokenSymbolByAddress(tokenAddress)}{" "}
-                    {Number(totalDeposits.toFixed(4))}
-                  </p>
-                </div>
-              ))}
-          </div>
-        </div> */}
         <div
           style={{
             margin: "0 auto",
@@ -394,29 +326,29 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
           }}
           className="w-fit"
         >
-          <div className="relative h-fit w-fit rounded-full p-3">
+          <div className={`relative h-fit w-fit rounded-full p-3 ${styles['wheel-container']}`}>
             <Image
               src={"/images/arrow.svg"}
               alt="arrow"
               width={50}
               height={50}
-              className="absolute left-1/2 top-[20%] z-10 -translate-x-1/2 rotate-180"
+              className={`absolute left-1/2 top-[20%] z-10 -translate-x-1/2 rotate-180 ${styles['pixelated-image']}`}
             />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold font-pixel-operator">
               {(poolStatus === PoolStatus.DEPOSIT_IN_PROGRESS ||
                 poolStatus === PoolStatus.WAIT_FOR_FIST_DEPOSIT) && (
-                  <>
-                    <p className="text-center">STT</p>
-                    <p className="text-center font-pixel-operator text-[52px] leading-[52px]">
-                      {formatEther(kuroData?.totalValue || "0")}
-                    </p>
-                    <p className="text-center opacity-50">Deposited</p>
-                  </>
-                )}
+                <>
+                  <p className="text-center text-retro-yellow">STT</p>
+                  <p className="text-center font-pixel-operator text-[52px] leading-[52px] text-retro-yellow">
+                    {formatEther(kuroData?.totalValue || "0")}
+                  </p>
+                  <p className="text-center opacity-50">Deposited</p>
+                </>
+              )}
 
               {poolStatus === PoolStatus.DRAWING_WINNER && (
                 <>
-                  <p className="ellipsis text-center opacity-50">
+                  <p className="ellipsis text-center opacity-50 text-retro-yellow">
                     Drawing winner
                   </p>
                 </>
@@ -441,7 +373,11 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                     <path
                       d={`
                      M 50 5
-                     A 45 45 0 ${progress > 0.5 ? 1 : 0} 1 ${50 + 45 * Math.cos(2 * Math.PI * progress - Math.PI / 2)} ${50 + 45 * Math.sin(2 * Math.PI * progress - Math.PI / 2)}
+                     A 45 45 0 ${
+                       progress > 0.5 ? 1 : 0
+                     } 1 ${50 + 45 * Math.cos(2 * Math.PI * progress - Math.PI / 2)} ${
+                        50 + 45 * Math.sin(2 * Math.PI * progress - Math.PI / 2)
+                      }
                      L 50 50
                      Z
                    `}
@@ -454,7 +390,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                   cy="50"
                   r="45"
                   fill="none"
-                  stroke="#fff"
+                  stroke="#9C63FA40"
                   strokeWidth="2"
                   strokeDasharray="5 2" // Tạo hiệu ứng dashed
                   clipPath="url(#circleClip)"
@@ -489,18 +425,18 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                     data:
                       mapToData(pool).length > 0
                         ? mapToData(pool).map((d, index) => ({
-                          label: formatEthereumAddress(d.label),
-                          id: d.label,
-                          value: Number(d.value),
-                          color: colors[index % colors.length],
-                        }))
+                            label: formatEthereumAddress(d.label),
+                            id: d.label,
+                            value: Number(d.value),
+                            color: colors[index % colors.length],
+                          }))
                         : [
-                          {
-                            label: "No Data",
-                            id: "no-data",
-                            value: 1,
-                          },
-                        ],
+                            {
+                              label: "No Data",
+                              id: "no-data",
+                              value: 1,
+                            },
+                          ],
 
                     valueFormatter: (value: { value: number }) => {
                       return mapToData(pool).length > 0
@@ -520,14 +456,15 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                 width={size}
                 height={size}
                 legend={{ hidden: true }}
-                sx={
-                  {
-                    "& .MuiPieArc-root": {
-                      stroke: "black",
-                      strokeWidth: 1,
-                    }
-                  }
-                }
+                sx={{
+                  "& .MuiPieArc-root": {
+                    stroke: "black",
+                    strokeWidth: 4,
+                  },
+                  "& .MuiChartsLegend-root": {
+                    fontFamily: "PixelOperator, monospace",
+                  },
+                }}
               />
             </div>
           </div>
