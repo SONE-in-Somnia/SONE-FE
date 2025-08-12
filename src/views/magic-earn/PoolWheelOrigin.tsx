@@ -407,7 +407,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
                 poolStatus === PoolStatus.WAIT_FOR_FIST_DEPOSIT) && (
                   <>
                     <p className="text-center">STT</p>
-                    <p className="text-center font-gajraj text-[52px] leading-[52px]">
+                    <p className="text-center font-pixel-operator text-[52px] leading-[52px]">
                       {formatEther(kuroData?.totalValue || "0")}
                     </p>
                     <p className="text-center opacity-50">Deposited</p>

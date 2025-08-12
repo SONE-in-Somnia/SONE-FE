@@ -31,6 +31,7 @@ const RoundHistory = () => {
   const [activeTab, setActiveTab] = useState<"all" | "youWin">("all");
 
   useEffect(() => {
+    refetchHistories(1, 500, activeTab);
   }, [activeTab, address]);
   const titleComponent = (
     <div className="flex w-full items-center justify-between">

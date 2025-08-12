@@ -16,6 +16,7 @@ export const useGetKuroHistory = () => {
       };
 
       if (body.type === "youWin") {
+        console.log(body.address);
         if (body.address) {
           params.address = body.address;
         } else {

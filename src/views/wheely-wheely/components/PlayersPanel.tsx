@@ -38,7 +38,7 @@ const PlayersPanel = () => {
               {formatEther(
                 player.deposits.reduce(
                   (acc, d) => acc + BigInt(d.amount),
-                  0n,
+                  BigInt(0),
                 ),
               )}{" "}
               STT
