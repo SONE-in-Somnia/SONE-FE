@@ -32,6 +32,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IconChevronsUp } from "@tabler/icons-react";
+import { RetroButton } from "@/components/RetroButton";
 
 export const findPlayerByAddress = (
   round: Round,

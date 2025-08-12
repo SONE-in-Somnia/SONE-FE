@@ -5,9 +5,14 @@ import Window from "./Window";
 import { RetroButton } from "@/components/RetroButton";
 import styles from "../../../styles/SonesHub.module.css";
 
+type Player = {
+  name: string;
+  score: number;
+};
+
 const SonesHub = () => {
-  const [activities, setActivities] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [activities, setActivities] = useState<string[]>([]);
+  const [leaderboard, setLeaderboard] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

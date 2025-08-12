@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { RetroButton } from "@/components/RetroButton";
 
 interface HistoryItemProps {
   history: Round;
@@ -67,9 +68,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
         (history?.participants?.length === 1 ? (
           <WithdrawButton round={history} className="mt-3 w-full" />
         ) : (
-          <Button className="mt-3 w-full" onClick={() => claim(history)}>
+          <RetroButton className="mt-3 w-full" onClick={() => claim(history)}>
             Claim
-          </Button>
+          </RetroButton>
         ))}
 
       {isWinner && history?.winnerClaimed && (
@@ -86,9 +87,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
             href={`https://shannon-explorer.somnia.network/tx/${history.txClaimed}`}
             className="w-full"
           >
-            <Button className="mt-3 w-full underline">
+            <RetroButton className="mt-3 w-full underline">
               {formatEthereumAddress(history.txClaimed)}
-            </Button>
+            </RetroButton>
           </Link>
         </div>
       )}
