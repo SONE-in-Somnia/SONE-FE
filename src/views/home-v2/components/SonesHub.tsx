@@ -64,14 +64,14 @@ const SonesHub = () => {
             <p className="text-sm mb-3">
               Contribute to the pot and win it all!
             </p>
-            <RetroButton>Play Now</RetroButton>
+            <RetroButton disabled>Play Now</RetroButton>
           </div>
           <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center blur-sm">
             <h4 className="font-bold text-lg mb-2">Coin Flip</h4>
             <p className="text-sm mb-3">
               A 50/50 chance to double your money.
             </p>
-              <RetroButton>Play Now</RetroButton>
+              <RetroButton disabled>Play Now</RetroButton>
           </div>
         </div>
 
