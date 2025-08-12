@@ -89,9 +89,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {...props}
         >
           <SidebarHeader className="">
-            <div className="flex items-center justify-between px-2 py-2">
+            <div className="flex items-center justify-between px-1 py-2">
               <div className="">
-                <Link href="/" className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-1">
                     <Image
                       src="/images/logo.svg"
                       width={42}
