@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Window from "./Window";
 import { RetroButton } from "@/components/RetroButton";
 import styles from "../../../styles/SonesHub.module.css";
+import Link from "next/link";
 
 type Player = {
   name: string;
@@ -54,21 +55,23 @@ const SonesHub = () => {
           <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center">
             <h4 className="font-bold text-lg mb-2">Wheely Wheely</h4>
             <p className="text-sm mb-3">Spin the wheel to win big prizes!</p>
-            <RetroButton>Play Now</RetroButton>
+            <Link href="/wheely-wheely">
+              <RetroButton>Play Now</RetroButton>
+            </Link>
           </div>
-          <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center">
+          <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center blur-sm">
             <h4 className="font-bold text-lg mb-2">Jackpot</h4>
             <p className="text-sm mb-3">
               Contribute to the pot and win it all!
             </p>
             <RetroButton>Play Now</RetroButton>
           </div>
-          <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center">
+          <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center blur-sm">
             <h4 className="font-bold text-lg mb-2">Coin Flip</h4>
             <p className="text-sm mb-3">
               A 50/50 chance to double your money.
             </p>
-            <RetroButton>Play Now</RetroButton>
+              <RetroButton>Play Now</RetroButton>
           </div>
         </div>
 
