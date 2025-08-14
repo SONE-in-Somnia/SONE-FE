@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import HeaderMobile from "@/views/share/HeaderMobile";
 import Notifier from "@/components/customized/notifier";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "SONE",
@@ -94,6 +95,18 @@ export default function RootLayout({
               <HeaderMobile />
               <div className="relative mx-auto flex w-full flex-1 flex-col gap-4 font-pixel-operator">
                 <Notifier />
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="dark"
+                />
                 <div className="p-4">{children}</div>
               </div>
             </SidebarInset>

@@ -1,0 +1,29 @@
+# subgraph/schema.graphql
+
+type Raffle @entity(immutable: true) {
+  id: ID!
+  title: String!
+  prize: String!
+  endsAt: BigInt!
+  ticketsSold: BigInt!
+  ticketPrice: BigInt!
+  prizePool: BigInt!
+  status: String!
+  winner: Player
+  deposits: [Deposit!] @derivedFrom(field: "raffle")
+}
+
+type Player @entity(immutable: true) {
+  id: ID!
+  address: Bytes! @unique
+  deposits: [Deposit!] @derivedFrom(field: "player")
+  rafflesWon: [Raffle!] @derivedFrom(field: "winner")
+}
+
+type Deposit @entity(immutable: true) {
+  id: ID!
+  raffle: Raffle!
+  player: Player!
+  amount: BigInt!
+  timestamp: BigInt!
+}

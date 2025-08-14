@@ -151,6 +151,10 @@ const Notifier = () => {
             MON in Kuro game!
           </div>
         );
+      case 'success':
+        return <div className="text-retro-green">{notification.message || ""}</div>;
+      case 'error':
+        return <div className="text-retro-red">{notification.message || ""}</div>;
       default:
         return <div>{notification.message || ""}</div>;
     }

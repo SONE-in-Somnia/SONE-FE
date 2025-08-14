@@ -38,6 +38,12 @@ const data = {
       group: "main",
     },
     {
+      title: "RAFFLE",
+      url: "/raffle",
+      iconName: "ticket",
+      group: "main",
+    },
+    {
       title: "REWARDS",
       url: "/rewards",
       iconName: "sparkles",

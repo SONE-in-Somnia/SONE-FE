@@ -356,7 +356,7 @@ const PoolWheelOrigin: React.FC<RandomWheelProps> = ({ size = 400 }) => {
 
               {poolStatus === PoolStatus.SHOWING_WINNER && (
                 <>
-                  <p className="text-center opacity-50">
+                  <p className="text-center opacity-50 text-retro-yellow">
                     Winner is {winnerData?.winner.slice(0, 6)}...
                     {winnerData?.winner.slice(-4)}
                   </p>
