@@ -29,10 +29,11 @@ const AppContext = async ({
             />
 
             <NextTopLoader
+              color="#fff"
+              crawl={true}
               showSpinner={false}
-              height={3}
+              height={5}
               zIndex={1000}
-              color="#8371E9"
             />
           </KuroProvider>
         </SocketProvider>
