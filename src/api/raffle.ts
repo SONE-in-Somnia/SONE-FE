@@ -40,7 +40,8 @@ export const getRaffleById = async (id: string | number): Promise<Raffle | undef
       contract.drawTime(),
       contract.totalDeposits(),
       ethers.parseEther('0.1'), // Placeholder ticket price
-      contract.totalDeposits(), // Using totalDeposits as the prize pool for now
+      // contract.totalPrize(), // TODO: Uncomment this for production
+      ethers.parseEther('1234'), // Hardcoded for UI development
       contract.getWinner().then((winner: string) => winner === ethers.ZeroAddress ? 'in-progress' : 'completed'),
     ]);
 
@@ -60,19 +61,16 @@ export const getRaffleById = async (id: string | number): Promise<Raffle | undef
   }
 };
 
-export const buyRaffleTickets = async (raffleId: string, ticketCount: number, signer: ethers.Signer): Promise<{ success: boolean }> => {
+export const depositForRaffle = async (raffleId: string, depositAmount: bigint, signer: ethers.Signer): Promise<{ success: boolean; txHash?: string; error?: string }> => {
   try {
     const contract = getKuroContract(signer);
 
-    const ticketPrice = ethers.parseEther('0.1'); // Placeholder ticket price
-    const totalCost = ticketPrice * BigInt(ticketCount);
-
-    const tx = await contract.deposit({ value: totalCost });
+    const tx = await contract.deposit({ value: depositAmount });
     await tx.wait();
 
-    return { success: true };
-  } catch (error) {
-    console.error('Error buying tickets:', error);
-    return { success: false };
+    return { success: true, txHash: tx.hash };
+  } catch (error: any) {
+    console.error('Error depositing for raffle:', error);
+    return { success: false, error: error.message };
   }
 };

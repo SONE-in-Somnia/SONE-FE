@@ -2,12 +2,14 @@
 import React from 'react';
 import Window from '@/views/home-v2/components/Window';
 
-const PrizeInfo = ({ prize }: { prize: string }) => {
+const PrizeInfo = ({ winnerAddress }: { winnerAddress: string }) => {
   return (
-    <Window title="🏆 PRIZE 🏆" className='h-fit'>
+    <Window title="🏆 WINNER 🏆" className='h-fit'>
       <div className="p-4 text-center">
-        <p className="text-lg font-bold">The winner of this raffle will receive:</p>
-        <p className="text-4xl font-pixel-operator-mono-bold text-retro-green mt-2">{prize}</p>
+        <p className="text-lg font-bold">Winner's Address:</p>
+        {/* <p className="text-2xl font-pixel-operator-mono-bold text-retro-yellow mt-2 break-all">{winnerAddress}</p> */}
+        <p className="text-2xl font-pixel-operator-mono-bold text-retro-yellow mt-2 break-all">0x..51a2x</p>
+
       </div>
     </Window>
   );

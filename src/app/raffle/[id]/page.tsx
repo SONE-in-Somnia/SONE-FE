@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import RaffleCard from '@/components/raffle/RaffleCard';
-import TicketPurchase from '@/components/raffle/TicketPurchase';
+import RaffleDeposit from '@/components/raffle/RaffleDeposit';
 import PrizeInfo from '@/components/raffle/PrizeInfo';
 import RaffleHistory from '@/components/raffle/RaffleHistory';
 import { useGetRaffle } from '@/api/useGetRaffle';
@@ -18,7 +18,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import RaffleCardSkeleton from '@/skeleton/RaffleCardSkeleton';
-import TicketPurchaseSkeleton from '@/skeleton/TicketPurchaseSkeleton';
+import RaffleDepositSkeleton from '@/skeleton/RaffleDepositSkeleton';
 import PrizeInfoSkeleton from '@/skeleton/PrizeInfoSkeleton';
 import RaffleHistorySkeleton from '@/skeleton/RaffleHistorySkeleton';
 
@@ -32,12 +32,12 @@ const RafflePage = () => {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/raffle" className='text-white'>Raffles</Link>
+            <Link href="/raffle" className='text-white font-thin'>Raffles</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
+        <BreadcrumbSeparator className='text-white' />
         <BreadcrumbItem>
-          <BreadcrumbPage className='text-white'>Raffle #{id}</BreadcrumbPage>
+          <BreadcrumbPage className='text-white font-extrabold'>Raffle #{id}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
@@ -49,7 +49,7 @@ const RafflePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <RaffleCardSkeleton />
-            <TicketPurchaseSkeleton />
+            <RaffleDepositSkeleton />
           </div>
           <div className="space-y-8">
             <PrizeInfoSkeleton />
@@ -68,13 +68,14 @@ const RafflePage = () => {
 
   return (
     <RetroPanel title="Raffle Details" headerContent={breadcrumb} className='bg-green-700'>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          <RaffleCard raffle={raffleData} />
-          <TicketPurchase raffle={raffleData} />
-        </div>
-        <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
+        <div className="lg:col-span-2 space-y-4">
+          <RaffleCard raffle={raffleData} showParticipateButton={false} showExtraInfo={true} />
           <PrizeInfo prize={raffleData.prize} />
+
+        </div>
+        <div className="space-y-4">
+          <RaffleDeposit raffle={raffleData} />
           <RaffleHistory />
         </div>
       </div>

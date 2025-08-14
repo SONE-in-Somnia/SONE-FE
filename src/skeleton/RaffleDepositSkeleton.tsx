@@ -2,7 +2,7 @@
 import React from 'react';
 import Window from '@/views/home-v2/components/Window';
 
-const TicketPurchaseSkeleton = () => {
+const RaffleDepositSkeleton = () => {
   return (
     <Window title="Loading...">
       <div className="p-4 animate-pulse">
@@ -17,4 +17,4 @@ const TicketPurchaseSkeleton = () => {
   );
 };
 
-export default TicketPurchaseSkeleton;
+export default RaffleDepositSkeleton;

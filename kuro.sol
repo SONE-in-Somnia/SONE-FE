@@ -85,6 +85,9 @@ contract Kuro is Ownable, ReentrancyGuard, Pausable {
     /// @notice Maximum number of participants per round
     uint40 public maximumNumberOfParticipantsPerRound;
 
+    /// @notice The total prize for the current round
+    uint256 public totalPrize;
+
     /// @notice Mapping of round ID to Round
     mapping(uint256 => Round) public rounds;
 
@@ -1235,6 +1238,14 @@ contract Kuro is Ownable, ReentrancyGuard, Pausable {
         require(_newKeeper != address(0), "Invalid keeper address");
         keeper = _newKeeper;
         emit KeeperUpdated(_newKeeper);
+    }
+
+    /**
+     * @notice Set the total prize for the raffle
+     * @param _newPrize The new total prize
+     */
+    function setTotalPrize(uint256 _newPrize) external onlyOwner {
+        totalPrize = _newPrize;
     }
 
     /**
