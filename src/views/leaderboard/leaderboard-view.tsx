@@ -49,7 +49,7 @@ const LeaderboardView = () => {
     }
 
     return (
-        <RetroPanel title="♦️ LEADERBOARD ♦️" className="bg-retro-orange h-fit">
+        <RetroPanel title="🏆 LEADERBOARD 🏆" className="bg-retro-orange h-fit">
             <div className="mx-auto px-3 py-8 font-pixel-operator-mono">
                 <div className="mb-5 h-[105px] overflow-hidden">
                     <Image
