@@ -1,5 +1,5 @@
 // src/api/raffle.ts
-import { Raffle } from '@/types/raffle';
+import { PoolType } from '@/data/types/pool.type';
 import { ethers } from 'ethers';
 import { KuroABI } from '@/abi/KuroABI';
 
@@ -15,7 +15,7 @@ const getKuroContract = (providerOrSigner: ethers.Provider | ethers.Signer) => {
   return new ethers.Contract(KURO_CONTRACT_ADDRESS, KuroABI, providerOrSigner);
 };
 
-export const getRaffles = async (): Promise<Raffle[]> => {
+export const getRaffles = async (): Promise<PoolType[]> => {
   // This is a placeholder. In a real application, you would likely have a factory contract
   // or an off-chain service that provides a list of all raffles.
   // For now, we will return a single raffle based on the KURO_CONTRACT_ADDRESS.
@@ -23,37 +23,38 @@ export const getRaffles = async (): Promise<Raffle[]> => {
   return raffle ? [raffle] : [];
 };
 
-export const getRaffleById = async (id: string | number): Promise<Raffle | undefined> => {
+export const getRaffleById = async (id: string): Promise<PoolType | undefined> => {
   try {
     const provider = getProvider();
     const contract = getKuroContract(provider);
 
-    // The PrizePool ABI doesn't have a concept of multiple raffles, so we'll treat the contract
-    // itself as a single raffle. The 'id' will be the contract address.
-    if (id.toString().toLowerCase() !== KURO_CONTRACT_ADDRESS.toLowerCase()) {
+    if (id.toLowerCase() !== KURO_CONTRACT_ADDRESS.toLowerCase()) {
       return undefined;
     }
 
-    const [title, prize, endsAt, ticketsSold, ticketPrice, prizePool, status] = await Promise.all([
+    const [name, symbol, depositDeadline, drawTime, tokenAddress, totalDeposits, winner] = await Promise.all([
       contract.name(),
-      contract.token(), // Using the token address as the prize for now
+      contract.symbol(),
+      contract.depositDeadline(),
       contract.drawTime(),
+      contract.token(),
       contract.totalDeposits(),
-      ethers.parseEther('0.1'), // Placeholder ticket price
-      // contract.totalPrize(), // TODO: Uncomment this for production
-      ethers.parseEther('1234'), // Hardcoded for UI development
-      contract.getWinner().then((winner: string) => winner === ethers.ZeroAddress ? 'in-progress' : 'completed'),
+      contract.getWinner(),
     ]);
+
+    const status = winner === ethers.ZeroAddress ? "INPROCESS" : "COMPLETED";
 
     return {
       id: KURO_CONTRACT_ADDRESS,
-      title,
-      prize,
-      endsAt: new Date(Number(endsAt) * 1000).toISOString(),
-      ticketsSold: Number(ticketsSold),
-      ticketPrice: Number(ethers.formatEther(ticketPrice)),
-      prizePool: Number(ethers.formatEther(prizePool)),
+      depositDeadline: new Date(Number(depositDeadline) * 1000).toISOString(),
+      name,
+      poolAddress: KURO_CONTRACT_ADDRESS as `0x${string}`,
+      symbol,
+      drawTime: new Date(Number(drawTime) * 1000).toISOString(),
+      tokenAddress,
       status,
+      totalDeposits: ethers.formatEther(totalDeposits),
+      winner,
     };
   } catch (error) {
     console.error('Error fetching raffle data:', error);

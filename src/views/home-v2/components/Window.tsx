@@ -32,7 +32,7 @@ const Window: React.FC<WindowProps> = ({
         onClick={onTitleClick}
       >
         {typeof title === "string" ? (
-          <h2 className="text-[16px] font-pixel-operator-mono font-bold">
+          <h2 className="text-[16px] font-pixel-operator-mono font-bold pl-1">
             {title}
           </h2>
         ) : (

@@ -1,4 +1,4 @@
-type PoolType = {
+export type PoolType = {
     id: string,
     depositDeadline: string,
     name: string,
@@ -9,17 +9,17 @@ type PoolType = {
     status: "INPROCESS" | "COMPLETED" | "WITHDRAW"
     totalDeposits: string
     winner: string,
-    
+
 }
 
-type RecentActivity = {
+export type RecentActivity = {
     user: string;
     amount: string;
     timestamp: string;
     transactionHash: string;
 }
 
-type PlayerType = {
+export type PlayerType = {
     address: string,
     winrate: string,
     totalDeposits: string,

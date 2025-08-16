@@ -37,7 +37,13 @@ extreme addiction 🥵`;
               </div>
               <div className="h-1/4 flex items-center justify-between p-2">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="w-10 h-10 rounded-full bg-retro-gray"></div>
+                  <Image
+                    src={game.image}
+                    alt={game.name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                   <span className="font-bold">{game.name}</span>
                 </div>
                 <RetroButton onClick={() => router.push(game.link)}>Play</RetroButton>

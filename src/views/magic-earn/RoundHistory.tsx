@@ -27,7 +27,7 @@ export const getTotalUserEntries = (round: Round, address: string): bigint => {
 };
 
 const RoundHistory = () => {
-  const { refetchHistories, allHistories, myWinHistories } = useKuro();
+  const { refetchHistories, allHistories, myWinHistories, isFetchingKuroHistory, isErrorKuroHistory } = useKuro();
   const { address } = useAppKitAccount();
   const [activeTab, setActiveTab] = useState<"all" | "youWin">("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,6 +67,24 @@ const RoundHistory = () => {
 
   const historiesToShow = filteredHistories ?? (activeTab === "all" ? allHistories?.data : myWinHistories?.data);
 
+  const renderContent = () => {
+    if (isFetchingKuroHistory) {
+      return <div className="text-center">Loading...</div>;
+    }
+
+    if (isErrorKuroHistory) {
+      return <div className="text-center text-red-500">Error loading history.</div>;
+    }
+
+    if (!historiesToShow || historiesToShow.length === 0) {
+      return <div className="text-center">No history found.</div>;
+    }
+
+    return historiesToShow.map((history, index) => (
+      <HistoryItem history={history} key={index} isWinner={activeTab === "youWin"} />
+    ));
+  };
+
   return (
     <div className="flex h-[600px] items-center justify-center">
       <Window title={titleComponent} headerClassName="bg-green-700" className="w-[1024px] ">
@@ -104,9 +122,7 @@ const RoundHistory = () => {
             </div>
           </div>
           <div className="mt-4 flex flex-col gap-4 h-[calc(100%-4rem)] overflow-y-auto">
-            {historiesToShow?.map((history, index) => (
-                <HistoryItem history={history} key={index} isWinner={activeTab === "youWin"} />
-              ))}
+            {renderContent()}
           </div>
         </div>
       </Window>

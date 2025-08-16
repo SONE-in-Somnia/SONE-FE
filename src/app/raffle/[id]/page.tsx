@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import RaffleCard from '@/components/raffle/RaffleCard';
 import RaffleDeposit from '@/components/raffle/RaffleDeposit';
-import PrizeInfo from '@/components/raffle/PrizeInfo';
+import WinnerInfo from '@/components/raffle/WinnerInfo';
 import RaffleHistory from '@/components/raffle/RaffleHistory';
-import { useGetRaffle } from '@/api/useGetRaffle';
+import { useGetPoolById } from '@/api/useGetPoolById'; // Import the efficient hook
 import RetroPanel from '@/components/customized/RetroPanel';
 import {
   Breadcrumb,
@@ -19,13 +19,16 @@ import {
 } from '@/components/ui/breadcrumb';
 import RaffleCardSkeleton from '@/skeleton/RaffleCardSkeleton';
 import RaffleDepositSkeleton from '@/skeleton/RaffleDepositSkeleton';
-import PrizeInfoSkeleton from '@/skeleton/PrizeInfoSkeleton';
+import WinnerInfoSkeleton from '@/skeleton/WinnerInfoSkeleton';
 import RaffleHistorySkeleton from '@/skeleton/RaffleHistorySkeleton';
+import Deposit from '@/views/magic-earn/Deposit';
+
 
 const RafflePage = () => {
   const params = useParams();
-  const { id } = params;
-  const { raffleData, loading } = useGetRaffle(id as string);
+  const id = params.id as string;
+
+  const { data: raffleData, isLoading: loading, isError } = useGetPoolById(id);
 
   const breadcrumb = (
     <Breadcrumb>
@@ -49,10 +52,10 @@ const RafflePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <RaffleCardSkeleton />
-            <RaffleDepositSkeleton />
           </div>
           <div className="space-y-8">
-            <PrizeInfoSkeleton />
+            <RaffleDepositSkeleton />
+            <WinnerInfoSkeleton />
             <RaffleHistorySkeleton />
           </div>
         </div>
@@ -60,10 +63,14 @@ const RafflePage = () => {
     );
   }
 
-  if (!raffleData) {
-    return <div className="flex justify-center items-center h-screen">
-      <div className="text-2xl font-bold">Raffle not found.</div>
-    </div>;
+  if (isError || !raffleData) {
+    return (
+      <RetroPanel title="Not Found" headerContent={breadcrumb} className='bg-red-700'>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-2xl font-bold text-white">Raffle not found.</div>
+        </div>
+      </RetroPanel>
+    );
   }
 
   return (
@@ -71,12 +78,17 @@ const RafflePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
         <div className="lg:col-span-2 space-y-4">
           <RaffleCard raffle={raffleData} showParticipateButton={false} showExtraInfo={true} />
-          <PrizeInfo prize={raffleData.prize} />
-
+          <WinnerInfo raffle={raffleData} />
         </div>
-        <div className="space-y-4">
-          <RaffleDeposit raffle={raffleData} />
-          <RaffleHistory />
+        {/* Right column setup for proportional height */}
+        <div className="flex flex-col gap-4">
+          {/* Add flex-grow to this component to make it take up available space */}
+          <div className="flex-grow">
+            <RaffleDeposit />
+          </div>
+          <div>
+            <RaffleHistory poolId={raffleData.id} />
+          </div>
         </div>
       </div>
     </RetroPanel>

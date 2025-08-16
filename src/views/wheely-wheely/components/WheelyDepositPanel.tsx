@@ -33,6 +33,8 @@ import RetroPanel from "@/components/customized/RetroPanel";
 
 const WheelyDepositPanel = () => {
   const [depositAmount, setDepositAmount] = useState<string>("0.1");
+  const [inputError, setInputError] = useState<string | null>(null);
+
 
   const { writeContractAsync: depositToken, isPending: isDepositing } =
     useWriteContract();
@@ -42,7 +44,7 @@ const WheelyDepositPanel = () => {
   const { chainId } = useAccount();
 
   const { poolStatus, kuroData } = useKuro();
-  const { address } = useAppKitAccount();
+  const { address, isConnected } = useAppKitAccount();
   const { supportedTokens, getTokenSymbolByAddress, updateSupportedTokens } =
     useAuth();
 
@@ -52,19 +54,26 @@ const WheelyDepositPanel = () => {
   const [isLoadingApproval, setIsLoadingApproval] = useState(false);
   const { updateNativeBalance } = useAuth();
 
-  // DEBUG LOGS
   useEffect(() => {
-    console.log("WheelyDepositPanel poolStatus:", poolStatus);
-    console.log("WheelyDepositPanel isDepositing:", isDepositing);
-    console.log("WheelyDepositPanel depositAmount:", depositAmount);
-    console.log(
-      "Is button disabled?",
-      !depositAmount ||
-        isDepositing ||
-        (poolStatus !== PoolStatus.WAIT_FOR_FIST_DEPOSIT &&
-          poolStatus !== PoolStatus.DEPOSIT_IN_PROGRESS),
-    );
-  }, [poolStatus, isDepositing, depositAmount]);
+    if (!isConnected) {
+      setSelectedToken(null);
+    }
+  }, [isConnected]);
+
+  useEffect(() => {
+    const amount = parseFloat(depositAmount);
+    if (selectedToken) {
+      const balance = parseFloat(convertWeiToEther(selectedToken.balance));
+      const minDeposit = parseFloat(convertWeiToEther(selectedToken.minDeposit));
+      if (amount > balance) {
+        setInputError("Insufficient balance");
+      } else if (amount < minDeposit && amount !== 0) {
+        setInputError(`Deposit can't be less than ${minDeposit}`);
+      } else {
+        setInputError(null);
+      }
+    }
+  }, [depositAmount, selectedToken]);
 
   const handleSetNativeToken = async () => {
     if (!address) {
@@ -73,7 +82,7 @@ const WheelyDepositPanel = () => {
     }
 
     if (chainId !== somniaTestnet.id) {
-      toast.error("Please switch to Monad Testnet");
+      toast.error("Please switch to Somnia Testnet");
       return;
     }
 
@@ -184,7 +193,7 @@ const WheelyDepositPanel = () => {
     }
 
     if (chainId !== somniaTestnet.id) {
-      toast.error("Please switch to Monad Testnet");
+      toast.error("Please switch to Somnia Testnet");
       console.log("Deposit failed: Wrong chainId", chainId);
       return;
     }
@@ -343,14 +352,16 @@ const WheelyDepositPanel = () => {
                   rawValue = parts.join(".");
                 }
               }
+
               setDepositAmount(rawValue);
             }}
           />
           <span className="mt-10 text-[24px] font-bold">({currencySymbol})</span>
         </div>
+        {inputError && <p className="text-red-500 text-xs">{inputError}</p>}
         <p className="text-xs">
-          {selectedToken &&
-            `Minimum Value: ${convertWeiToEther(selectedToken.minDeposit) + " " + getTokenSymbolByAddress(selectedToken.address)}`}
+          {selectedToken && `Minimum Value: ${convertWeiToEther(selectedToken.minDeposit)} ${getTokenSymbolByAddress(selectedToken.address)}`
+          }
         </p>
         <div className="flex items-center justify-between gap-3">
           {selectedToken?.address !== "0x0000000000000000000000000000000000000000" && needsApproval() && (
@@ -367,27 +378,24 @@ const WheelyDepositPanel = () => {
                 <span className="text-xs">
                   Balance:{" "}
                   {selectedToken
-                    ? convertWeiToEther(selectedToken.balance) +
-                    " " +
-                    getTokenSymbolByAddress(selectedToken?.address)
+                    ? `${convertWeiToEther(selectedToken.balance)} 
+                    ${getTokenSymbolByAddress(selectedToken?.address)}`
                     : 0}
                 </span>
               </div>
-              {/* <ChevronsUpDown className="h-3 w-3 text-muted-foreground" /> */}
               <ChevronsDown className="h-3 w-3 text-muted-foreground" />
-
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex flex-col gap-2 bg-transparent border-retro-black rounded-none"
               align="start"
             >
-              {supportedTokens.length > 0 &&
+              {supportedTokens.length > 0 && 
                 selectedToken &&
                 supportedTokens.map((token) => (
                   <DropdownMenuItem
                     key={token.address}
                     className={
                       token.address.toLowerCase() ===
-                        selectedToken.address.toLowerCase()
+                        selectedToken?.address.toLowerCase()
                         ? "bg-gray-200"
                         : "bg-transparent"
                     }
@@ -412,9 +420,9 @@ const WheelyDepositPanel = () => {
             onClick={handleApproval}
             type="button"
             className="w-full"
-            disabled={!depositAmount || isLoadingApproval}
+            disabled={!depositAmount || isApproving || !!inputError}
           >
-            {isLoadingApproval ? "APPROVING..." : "APPROVE"}
+            {isApproving ? "APPROVING..." : "APPROVE"}
           </RetroButton>
         ) : (
           <RetroButton

@@ -1,20 +1,19 @@
 import axiosInstance from "@/lib/axios";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { ReferralSummary } from "@/types";
 
-interface ReferralSummary {
-    totalReferrals: number;
-    totalReferralPoints: number;
-}
+const getReferralSummary = async (address: string): Promise<ReferralSummary> => {
+    const path = `/api/referral/summary/${address}`;
+    const { data } = await axiosInstance.get(path);
+    return data.data;
+};
 
-const useGetReferralSummary = () => {
-    return useMutation({
-        mutationKey: ["GET_REFERRAL_SUMMARY"],
-        mutationFn: async (address: string): Promise<ReferralSummary> => {
-            const path = `/api/referral/summary/${address}`;
-            const res = await axiosInstance.get(path);
-            return res.data.data;
-        }
+const useGetReferralSummary = (address: string) => {
+    return useQuery({
+        queryKey: ["referralSummary", address],
+        queryFn: () => getReferralSummary(address),
+        enabled: !!address,
     });
 };
 
-export default useGetReferralSummary; 
+export default useGetReferralSummary;

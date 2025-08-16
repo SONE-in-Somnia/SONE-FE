@@ -1,51 +1,35 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Window from "./Window";
 import { RetroButton } from "@/components/RetroButton";
 import styles from "../../../styles/SonesHub.module.css";
 import Link from "next/link";
-
-type Player = {
-  name: string;
-  score: number;
-};
+import useGetLeaderboard from "@/api/useGetLeaderboard";
+import LeaderboardTable from "@/components/leaderboard/leaderboard-table";
 
 const SonesHub = () => {
-  const [activities, setActivities] = useState<string[]>([]);
-  const [leaderboard, setLeaderboard] = useState<Player[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: leaderboard = [],
+    isLoading,
+    isError,
+  } = useGetLeaderboard();
 
-  const fetchData = async () => {
-    try {
-      // Replace with your actual API endpoints
-      const activitiesResponse = await fetch("/api/activities");
-      const leaderboardResponse = await fetch("/api/leaderboard");
+  const activities: string[] = [];
+  // Mock activities data
+  // const activities = [
+  //   "User1 deposited 100 STT",
+  //   "User2 won 50 STT in Wheely Wheely",
+  //   "User3 deposited 200 STT",
+  //   "User4 won 100 STT in Wheely Wheely",
+  //   "User5 deposited 50 STT",
+  // ];
 
-      if (!activitiesResponse.ok || !leaderboardResponse.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const activitiesData = await activitiesResponse.json();
-      const leaderboardData = await leaderboardResponse.json();
-
-      setActivities(activitiesData);
-      setLeaderboard(leaderboardData);
-      setError(null);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData(); // Fetch initial data
-    const interval = setInterval(fetchData, 5000); // Poll for new data every 5 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
+  const formattedLeaderboardData = leaderboard.map((player, index) => ({
+    rank: index + 1,
+    address: player.address,
+    total_deposit: player.totalPoints,
+  }));
 
   return (
     <Window title="🎮 SONE'S HUB ⚔">
@@ -71,36 +55,38 @@ const SonesHub = () => {
             <p className="text-sm mb-3">
               A 50/50 chance to double your money.
             </p>
-              <RetroButton disabled>Play Now</RetroButton>
+            <RetroButton disabled>Play Now</RetroButton>
           </div>
         </div>
 
         {/* Column 2: Live Activity Feed */}
         <div className="col-span-1">
-          {loading && <p>Loading activities...</p>}
-          {error && <p className="text-red-500">{error}</p>}
-          {!loading && !error && activities.map((activity, index) => {
-            const parts = activity.split(/(\d+\.?\d*)/g);
-            return (
-              <div
-                key={index}
-                className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-1 mb-3 flex justify-between ring-4 ring-retro-black/20"
-              >
-                <span>
-                  {parts.map((part, i) =>
-                    /(\d+\.?\d*)/.test(part) ? (
-                      <span key={i} className="font-bold">
-                        {part}
-                      </span>
-                    ) : (
-                      part
-                    )
-                  )}
-                </span>
-                <span className="text-gray-500">now</span>
-              </div>
-            );
-          })}
+          {isLoading && <p>Loading activities...</p>}
+          {isError && <p className="text-red-500">Failed to load activities</p>}
+          {!isLoading &&
+            !isError &&
+            activities.map((activity, index) => {
+              const parts = activity.split(/(\d+\.?\d*)/g);
+              return (
+                <div
+                  key={index}
+                  className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-1 mb-3 flex justify-between ring-4 ring-retro-black/20"
+                >
+                  <span>
+                    {parts.map((part, i) =>
+                      /(\d+\.?\d*)/.test(part) ? (
+                        <span key={i} className="font-bold">
+                          {part}
+                        </span>
+                      ) : (
+                        part
+                      )
+                    )}
+                  </span>
+                  <span className="text-gray-500">now</span>
+                </div>
+              );
+            })}
         </div>
 
         {/* Column 3: Leaderboard & CTA */}
@@ -109,20 +95,14 @@ const SonesHub = () => {
         >
           <div>
             <h3 className="font-bold text-xl mb-2">🏆 Top Winners 🏆</h3>
-            {loading && <p>Loading leaderboard...</p>}
-            {error && <p className="text-red-500">{error}</p>}
-            {!loading && !error && (
-              <ul className="text-left">
-                {leaderboard.map((player, index) => (
-                  <li key={player.name} className="mb-1">
-                    {index + 1}. {player.name} - {player.score.toFixed(3)} STT
-                  </li>
-                ))}
-              </ul>
-            )}
+            {isLoading && <p>Loading leaderboard...</p>}
+            {isError && <p className="text-red-500">Failed to load leaderboard.</p>}
+            {!isLoading && !isError && <LeaderboardTable data={formattedLeaderboardData} />}
           </div>
           <div className="mt-4">
-            <h3 className="font-bold text-[24px]">LET'S GO NUT JOIN WITH US</h3>
+            <h3 className="font-bold text-[24px]">
+              LET'S GO NUT JOIN WITH US
+            </h3>
             <p className="my-4 text-[24px] font-bold">
               GET LISTED ON SONE NOW DUDE
             </p>

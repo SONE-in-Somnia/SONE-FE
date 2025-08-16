@@ -49,10 +49,12 @@ const useGetPools = () => {
         // // Không tự động fetch khi mount lại component
         // refetchOnMount: false,
         queryFn: async () => {
-            const path = '/api/fetch-pools'
+            const path = '/api/pools'
             const pool = await axiosInstance.get(path)
-            return pool.data.data;
-        }
+            return pool.data;
+        },
+        staleTime: 5 * 60 * 1000, // 5 phút
+        refetchOnWindowFocus: false,
     })
 }
 
