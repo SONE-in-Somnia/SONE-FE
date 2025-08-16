@@ -1,6 +1,8 @@
+// src/api/useGetKuroHistory.ts
 import axiosInstance from "@/lib/axios";
 import { Round, RoundHistoryResponse } from "@/types/round";
 import { useMutation } from "@tanstack/react-query";
+
 export const useGetKuroHistory = () => {
   return useMutation({
     mutationKey: ["GET_KURO_HISTORY"],
@@ -16,8 +18,6 @@ export const useGetKuroHistory = () => {
       };
 
       if (body.type === "youWin") {
-        console.log(body.address);
-
         if (body.address) {
           params.address = body.address;
         } else {
@@ -33,9 +33,15 @@ export const useGetKuroHistory = () => {
       }
 
       const path = "/api/kuro/get-all-pools";
-      const { data } = await axiosInstance.post(path, {
-        ...params,
-      });
+      const { data } = await axiosInstance.post(
+        path,
+        {
+          ...params,
+        },
+        {
+          timeout: 30000,
+        }
+      );
       return data;
     },
   });

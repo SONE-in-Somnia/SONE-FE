@@ -75,13 +75,6 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
 
       {isWinner && history?.winnerClaimed && (
         <div className="flex items-center gap-2">
-          {/* <Link
-            target="_blank"
-            href={``}
-            className="cursor-pointer text-sm underline hover:underline"
-          >
-            {formatEthereumAddress(history?.txClaimed)}
-          </Link> */}
           <Link
             target="_blank"
             href={`https://shannon-explorer.somnia.network/tx/${history.txClaimed}`}

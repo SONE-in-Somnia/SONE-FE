@@ -54,7 +54,7 @@ const SignInPrompt: React.FC<SignInPromptProps> = ({ signature, onSignInSuccess,
 
     if (!isConnected) {
         return (
-            <Window>
+            <Window title="">
                 <div className="flex justify-center items-center h-full">
                     <RetroButton onClick={() => open()}>Sign In</RetroButton>
                 </div>
@@ -64,7 +64,7 @@ const SignInPrompt: React.FC<SignInPromptProps> = ({ signature, onSignInSuccess,
 
     if (signature) {
         return (
-            <Window>
+            <Window title="">
                 <div className="flex flex-col justify-center items-center h-full">
                     <p className="mb-4">You are signed in!</p>
                     <RetroButton onClick={handleDisconnect}>Disconnect</RetroButton>
@@ -74,7 +74,7 @@ const SignInPrompt: React.FC<SignInPromptProps> = ({ signature, onSignInSuccess,
     }
 
     return (
-        <Window>
+        <Window title="">
             <div className="flex flex-col justify-center items-center h-full">
                 <p>Please sign the message in your wallet...</p>
             </div>
