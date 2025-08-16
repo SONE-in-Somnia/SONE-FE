@@ -57,7 +57,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ address, rank, points
     };
 
     return (
-        <Window title="Your Stats">
+        <Window title="⚡️ YOUR STATS ⚡️">
             <div className="p-4">
                 <div className="flex items-center">
                     <img src={generateAvatar(address)} alt="User Avatar" className="w-16 h-16 rounded-none mr-4" />

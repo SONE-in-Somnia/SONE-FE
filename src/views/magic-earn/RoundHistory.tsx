@@ -55,7 +55,7 @@ const RoundHistory = () => {
   const titleComponent = (
     <div className="flex w-full items-center justify-between">
         <h2 className="text-[16px] font-pixel-operator-mono font-bold">
-          Round History
+          ROUND HISTORY
         </h2>
         <DialogClose asChild>
           <RetroButton className="px-2 py-0 text-sm">

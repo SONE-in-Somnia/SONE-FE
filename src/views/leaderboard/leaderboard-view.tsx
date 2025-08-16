@@ -49,7 +49,7 @@ const LeaderboardView = () => {
     }
 
     return (
-        <RetroPanel title="Leaderboard" className="bg-retro-orange h-fit">
+        <RetroPanel title="♦️ LEADERBOARD ♦️" className="bg-retro-orange h-fit">
             <div className="mx-auto px-3 py-8 font-pixel-operator-mono">
                 <div className="mb-5 h-[105px] overflow-hidden">
                     <Image
@@ -77,7 +77,7 @@ const LeaderboardView = () => {
                 </div>
                 <div className="flex gap-5">
                     <div className="w-1/2">
-                        <Window title="Ranking" className="bg-retro-yellow">
+                        <Window title="👑 RANKING 👑" className="bg-retro-yellow">
                             {leaderboardError && <p className="text-red-500 text-center">Failed to load leaderboard.</p>}
                             {!leaderboardError && <LeaderboardTable data={formattedLeaderboardData} />}
                         </Window>

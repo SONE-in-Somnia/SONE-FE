@@ -23,7 +23,7 @@ const MissionTable = () => {
     ];
 
     return (
-        <Window title="Missions">
+        <Window title=" 🎯 MISSIONS 🎯">
             <Table>
                 <TableHeader>
                     <TableRow>
