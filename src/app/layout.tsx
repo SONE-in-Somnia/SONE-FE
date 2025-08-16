@@ -14,6 +14,8 @@ import "react-toastify/dist/ReactToastify.css";
 import HeaderMobile from "@/views/share/HeaderMobile";
 import Notifier from "@/components/customized/notifier";
 import { ToastContainer } from "react-toastify";
+import GhostCursorWrapper from "@/components/customized/GhostCursorWrapper";
+
 
 export const metadata: Metadata = {
   title: "SONE",
@@ -72,6 +74,7 @@ export default function RootLayout({
       <body
         className={`containers relative antialiased ${pixelOperator.variable} ${pixelOperatorMono.variable} ${pixelOperatorMonoBold.variable} ${modernWarfare.variable}`}
       >
+        <GhostCursorWrapper />
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M3NX2RHQ"
