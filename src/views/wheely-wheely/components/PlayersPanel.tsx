@@ -41,7 +41,7 @@ const PlayersPanel = () => {
 
   return (
     <RetroPanel
-      title="PLAYERS"
+      title="Players"
       headerClassName="bg-green-700"
       headerContent={
         <span className="text-white text-sm">

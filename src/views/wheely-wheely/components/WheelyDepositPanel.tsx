@@ -293,7 +293,7 @@ const WheelyDepositPanel = () => {
   const currencySymbol = selectedToken ? getTokenSymbolByAddress(selectedToken.address) : "";
 
   return (
-    <RetroPanel title="INPUT YOUR ENTRY" headerClassName="bg-green-700">
+    <RetroPanel title="Input Your Entry" headerClassName="bg-green-700">
       <div className="flex flex-col gap-4 p-2 text-retro-black">
         <div>
           <p className="text-[16px]">Your Entries</p>
