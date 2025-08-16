@@ -28,7 +28,7 @@ const RafflesPage = () => {
 
     if (filteredRaffles.length === 0) {
       return (
-        <div className="text-center text-white py-16">
+        <div className="text-center text-retro-black py-16">
           <p className="text-2xl font-bold mb-2">No raffles found!</p>
           <p>There are currently no {activeTab === 'INPROCESS' ? 'active' : 'completed'} raffles. Please check back later.</p>
         </div>
