@@ -5,6 +5,7 @@ import HistoryItem from "./HistoryItem";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { Search } from "lucide-react";
 
+
 import { useEffect, useState } from "react";
 import { Round } from "@/types/round";
 import Window from "@/views/home-v2/components/Window";
@@ -27,15 +28,17 @@ export const getTotalUserEntries = (round: Round, address: string): bigint => {
 };
 
 const RoundHistory = () => {
-  const { refetchHistories, allHistories, myWinHistories, isFetchingKuroHistory, isErrorKuroHistory } = useKuro();
+  const { refetchHistories, allHistories, myWinHistories } = useKuro();
   const { address } = useAppKitAccount();
   const [activeTab, setActiveTab] = useState<"all" | "youWin">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredHistories, setFilteredHistories] = useState<Round[] | undefined>(undefined);
 
+
+
   useEffect(() => {
     refetchHistories(1, 500, activeTab);
-  }, [activeTab, address]);
+  }, [address, activeTab]);
 
   useEffect(() => {
     setFilteredHistories(undefined);
@@ -45,8 +48,8 @@ const RoundHistory = () => {
   const handleSearch = () => {
     const historiesToFilter = activeTab === "all" ? allHistories?.data : myWinHistories?.data;
     if (searchQuery === "") {
-        setFilteredHistories(undefined);
-        return;
+      setFilteredHistories(undefined);
+      return;
     }
     const filtered = historiesToFilter?.filter(history => history.roundId.toString().includes(searchQuery));
     setFilteredHistories(filtered);
@@ -54,40 +57,23 @@ const RoundHistory = () => {
 
   const titleComponent = (
     <div className="flex w-full items-center justify-between">
-        <h2 className="text-[16px] font-pixel-operator-mono font-bold">
-          ROUND HISTORY
-        </h2>
-        <DialogClose asChild>
-          <RetroButton className="px-2 py-0 text-sm">
-          &#10006;
-          </RetroButton>
-        </DialogClose>
-      </div>
-    );
-
+      <h2 className="font-pixel-operator-mono text-[16px] font-bold">
+        ROUND HISTORY
+      </h2>
+      <DialogClose asChild>
+        <RetroButton className="px-2 py-0 text-sm">&#10006;</RetroButton>
+      </DialogClose>
+    </div>
+  );
   const historiesToShow = filteredHistories ?? (activeTab === "all" ? allHistories?.data : myWinHistories?.data);
-
-  const renderContent = () => {
-    if (isFetchingKuroHistory) {
-      return <div className="text-center">Loading...</div>;
-    }
-
-    if (isErrorKuroHistory) {
-      return <div className="text-center text-red-500">Error loading history.</div>;
-    }
-
-    if (!historiesToShow || historiesToShow.length === 0) {
-      return <div className="text-center">No history found.</div>;
-    }
-
-    return historiesToShow.map((history, index) => (
-      <HistoryItem history={history} key={index} isWinner={activeTab === "youWin"} />
-    ));
-  };
 
   return (
     <div className="flex h-[600px] items-center justify-center">
-      <Window title={titleComponent} headerClassName="bg-green-700" className="w-[1024px] ">
+      <Window
+        title={titleComponent}
+        headerClassName="bg-green-700"
+        className="w-[1024px]"
+      >
         <div className="h-full w-full p-4">
           <div className="sticky top-0 z-10 flex items-center justify-between text-sm">
             <div className="overflow-hidden p-1">
@@ -122,9 +108,11 @@ const RoundHistory = () => {
             </div>
           </div>
           <div className="mt-4 flex flex-col gap-4 h-[calc(100%-4rem)] overflow-y-auto">
-            {renderContent()}
+            {historiesToShow?.map((history, index) => (
+              <HistoryItem history={history} key={index} isWinner={activeTab === "youWin"} />
+            ))}
           </div>
-        </div>
+          </div>
       </Window>
     </div>
   );

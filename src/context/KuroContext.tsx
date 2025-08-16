@@ -405,7 +405,7 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
     }
   };
 
-  const refetchHistories = async (
+  const refetchHistories = (
     page?: number,
     limit?: number,
     type?: "all" | "youWin",
