@@ -1,16 +1,13 @@
-// src/skeleton/PrizeInfoSkeleton.tsx
+// src/skeleton/WinnerInfoSkeleton.tsx
 import React from 'react';
 import Window from '@/views/home-v2/components/Window';
 
-const PrizeInfoSkeleton = () => {
-  return (
-    <Window title="Loading...">
-      <div className="p-4 animate-pulse">
-        <div className="h-8 bg-retro-gray-2 rounded mb-2 w-1/2"></div>
-        <div className="h-12 bg-retro-gray-2 rounded"></div>
-      </div>
-    </Window>
-  );
-};
+const WinnerInfoSkeleton = () => (
+  <Window title="🏆 WINNER 🏆">
+    <div className="p-4 animate-pulse">
+      <div className="bg-gray-700 rounded w-3/4 mx-auto"></div>
+    </div>
+  </Window>
+);
 
-export default PrizeInfoSkeleton;
+export default WinnerInfoSkeleton;

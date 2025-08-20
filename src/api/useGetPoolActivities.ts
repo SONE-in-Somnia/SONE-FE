@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query"
-import request, { gql } from "graphql-request"
+import { useQuery } from "@tanstack/react-query";
+import request, { gql } from "graphql-request";
 
 type ActivityType = "DEPOSIT" | "CLAIM" | "DRAW" | "OWNERSHIP_TRANSFERRED" | "UPDATE_DRAW_TIME" | "UPDATE_DEPOSIT_DEADLINE" | "ALL";
 
@@ -12,10 +12,10 @@ interface GetPoolActivitiesParams {
     orderDirection?: "asc" | "desc";
 }
 
-const useGetPoolActivities = () => {
-    return useMutation({
-        mutationKey: ["GET_POOL_ACTIVITIES"],
-        mutationFn: async (params: GetPoolActivitiesParams = {}) => {
+const useGetPoolActivities = (params: GetPoolActivitiesParams = {}) => {
+    return useQuery({
+        queryKey: ["GET_POOL_ACTIVITIES", params],
+        queryFn: async () => {
             const {
                 poolId,
                 user,
@@ -66,7 +66,8 @@ const useGetPoolActivities = () => {
             });
 
             return res.recentActivities ? res.recentActivities : [];
-        }
+        },
+        enabled: !!params.poolId,
     });
 };
 

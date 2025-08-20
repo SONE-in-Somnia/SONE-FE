@@ -1,5 +1,5 @@
 // src/api/raffle.ts
-import { PoolType } from '@/data/types/pool.type';
+import { PoolType } from '@/types/raffle';
 import { ethers } from 'ethers';
 import { KuroABI } from '@/abi/KuroABI';
 
@@ -50,10 +50,12 @@ export const getRaffleById = async (id: string): Promise<PoolType | undefined> =
       name,
       poolAddress: KURO_CONTRACT_ADDRESS as `0x${string}`,
       symbol,
+      startTime,
       drawTime: new Date(Number(drawTime) * 1000).toISOString(),
       tokenAddress,
       status,
       totalDeposits: ethers.formatEther(totalDeposits),
+      participantCount,
       winner,
     };
   } catch (error) {

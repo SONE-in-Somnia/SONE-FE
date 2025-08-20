@@ -2,11 +2,11 @@
 'use client';
 import React, { useState } from 'react';
 import useGetPools from '@/api/useGetPools'; // Import the correct, production-ready hook
-import RaffleCard from '@/components/raffle/RaffleCard';
+import RaffleCard from '@/views/raffle/RaffleCard';
 import RetroPanel from '@/components/customized/RetroPanel';
 import { RetroButton } from '@/components/RetroButton';
 import RaffleCardSkeleton from '@/skeleton/RaffleCardSkeleton';
-import { PoolType } from '@/data/types/pool.type'; // Import the type
+import { PoolType } from '@/types/raffle';
 
 const RafflesPage = () => {
   const { data: pools, isLoading: loading } = useGetPools(); // Use the correct hook
@@ -45,7 +45,7 @@ const RafflesPage = () => {
   };
 
   return (
-    <RetroPanel title="Raffles" className='bg-green-700'>
+    <RetroPanel title="Raffles" className='bg-green-700 max-w-[100%] w-[100%]'>
       <div className="p-4">
         <div className="flex justify-center mb-8 gap-4">
           <RetroButton

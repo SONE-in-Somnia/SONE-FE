@@ -1,11 +1,9 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { convertWeiToEther } from "@/utils/string";
-import { parseEther, parseUnits } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { YoloABIMultiToken } from "@/abi/YoloABI";
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { PoolStatus, useKuro } from "@/context/KuroContext";
 import {
   DropdownMenu,
@@ -13,54 +11,75 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Check, ChevronsUpDown, ChevronsDown } from "lucide-react";
-import { SupportedTokenInfo } from "@/types/round";
-import { ERC20ABI } from "@/abi/ERC20ABI";
+import { Check, ChevronsDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { somniaTestnet } from "@/config/chains";
-import Image from "next/image";
-import {
-  calculateWinChance,
-  getTotalEntries,
-  getUserEntries,
-} from "@/views/magic-earn/TotalPlayer";
-import { Divider } from "@mui/material";
 import { RetroButton } from "@/components/RetroButton";
-import RetroPanel from "@/components/customized/RetroPanel";
 import Window from "@/views/home-v2/components/Window";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import { config } from "@/config";
+import RaffleUserDeposit from "./RaffleUserDeposit";
+import { useTokenDeposit } from "@/hooks/useTokenDeposit";
+import { useDepositInput } from "@/hooks/useDepositInput";
+import { useTokenSelection } from "@/hooks/useTokenSelection";
+import { NATIVE_TOKEN_ADDRESS } from "@/config/constants";
+import PrizePoolABI from "@/abi/PrizePool.json";
+import { YoloABIMultiToken } from "@/abi/YoloABI";
 
-const RaffleDeposit = () => {
-  const [depositAmount, setDepositAmount] = useState<string>("0.1");
+const RaffleDeposit = ({ depositDeadline, prizePoolAddress }: { depositDeadline: string, prizePoolAddress: `0x${string}` }) => {
   const [depositTxHash, setDepositTxHash] = useState<`0x${string}` | undefined>();
   const [estimatedUsdValue, setEstimatedUsdValue] = useState<number | null>(null);
-  const [inputError, setInputError] = useState<string | null>(null);
+  const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
 
-  const { writeContractAsync: depositToken, isPending: isDepositing } =
-    useWriteContract();
-  const { writeContractAsync: approveToken, isPending: isApproving } =
-    useWriteContract();
-  const { writeContractAsync: setNativeToken } = useWriteContract();
   const { chainId } = useAccount();
-
   const { poolStatus, kuroData } = useKuro();
-  const { address, isConnected } = useAppKitAccount(); // Get isConnected status
-  const { supportedTokens, getTokenSymbolByAddress, updateSupportedTokens } =
-    useAuth();
-
-  const [selectedToken, setSelectedToken] =
-    useState<SupportedTokenInfo | null>();
-  const [unlimitedApproval, setUnlimitedApproval] = useState(false);
-  const [isLoadingApproval, setIsLoadingApproval] = useState(false);
-  const { updateNativeBalance } = useAuth();
+  const { address, isConnected } = useAppKitAccount();
+  const { supportedTokens, getTokenSymbolByAddress, updateSupportedTokens } = useAuth();
   const queryClient = useQueryClient();
 
-  const MOCK_STT_PRICE_USD = 0.10; // Mock price for STT
+  const { selectedToken, setSelectedToken } = useTokenSelection(supportedTokens, isConnected);
+  const { depositAmount, setDepositAmount, inputError, handleInputChange } = useDepositInput(selectedToken);
+  const {
+    handleDeposit,
+    handleApproval,
+    needsApproval,
+    isDepositing,
+    isApproving,
+    unlimitedApproval,
+    setUnlimitedApproval,
+  } = useTokenDeposit({
+    contractAddress: prizePoolAddress,
+    contractAbi: PrizePoolABI.abi,
+    depositFunctionName: "deposit",
+    selectedToken: selectedToken,
+    depositAmount: depositAmount,
+    onSuccess: (txHash) => {
+      setDepositTxHash(txHash as `0x${string}`);
+    },
+  });
+
+  const MOCK_STT_PRICE_USD = 0.10;
+  useEffect(() => {
+      if (!isConnected) {
+        setSelectedToken(null);
+      }
+    }, [isConnected, setSelectedToken]);
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      const now = Date.now() / 1000;
+      if (now > Number(depositDeadline)) {
+        setIsDeadlinePassed(true);
+      }
+    };
+    checkDeadline();
+    const interval = setInterval(checkDeadline, 1000);
+    return () => clearInterval(interval);
+  }, [depositDeadline]);
 
   useEffect(() => {
     const amount = parseFloat(depositAmount);
@@ -69,25 +88,7 @@ const RaffleDeposit = () => {
     } else {
       setEstimatedUsdValue(null);
     }
-
-    if (selectedToken) {
-      const balance = parseFloat(convertWeiToEther(selectedToken.balance));
-      if (amount > balance) {
-        setInputError("Amount exceeds balance");
-      } else {
-        setInputError(null);
-      }
-    }
   }, [depositAmount, selectedToken]);
-
-
-  // This effect watches for the connection status.
-  // If the wallet disconnects, we clean up the component's internal state.
-  useEffect(() => {
-    if (!isConnected) {
-      setSelectedToken(null);
-    }
-  }, [isConnected]);
 
   const { isSuccess: isDepositConfirmed, isError: isDepositError } = useWaitForTransactionReceipt({
     hash: depositTxHash,
@@ -109,206 +110,25 @@ const RaffleDeposit = () => {
     }
   }, [isDepositError]);
 
-  const handleSetNativeToken = async () => {
-    if (!address) {
-      toast.error("Please connect wallet");
-      return;
-    }
-
-    if (chainId !== somniaTestnet.id) {
-      toast.error("Please switch to Somnia Testnet");
-      return;
-    }
-
-    try {
-      await setNativeToken({
-        abi: YoloABIMultiToken,
-        address: process.env
-          .NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS as `0x${string}`,
-        functionName: "setNativeTokenConfig",
-        args: [true, parseUnits("0.01", 18), BigInt(10000)],
-      });
-
-      toast.success("Native token set successfully");
-    } catch (error) {
-      console.error("Error setting native token:", error);
-      toast.error("Error setting native token");
-    }
-  };
-
-  const needsApproval = (): boolean => {
-    if (
-      !selectedToken ||
-      selectedToken.address === "0x0000000000000000000000000000000000000000"
-    ) {
-      return false;
-    }
-
-    if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      return false;
-    }
-
-    try {
-      const requiredAmount = parseUnits(depositAmount, selectedToken.decimals);
-      const currentAllowance = selectedToken.allowance || BigInt(0);
-
-      if (unlimitedApproval) {
-        const unlimitedThreshold = parseUnits(
-          "1000000000",
-          selectedToken.decimals,
-        );
-        return currentAllowance < unlimitedThreshold;
-      }
-
-      return currentAllowance < requiredAmount;
-    } catch {
-      return false;
-    }
-  };
-
-  const handleApproval = async () => {
-    if (!selectedToken) {
-      toast.error("Please select a token");
-      return;
-    }
-
-    if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
-
-    try {
-      setIsLoadingApproval(true);
-      let amount: bigint;
-
-      if (unlimitedApproval) {
-        amount = BigInt(
-          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-        );
-      } else {
-        amount = parseUnits(depositAmount, selectedToken.decimals);
-      }
-
-      const res = approveToken({
-        abi: ERC20ABI,
-        address: selectedToken.address as `0x${string}`,
-        functionName: "approve",
-        args: [process.env.NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS, amount],
-      });
-
-      await toast
-        .promise(res, {
-          pending: "Approval processing..",
-          success: "Approval Success. 👌",
-          error: "Approval failed. 🤯",
-        })
-        .then(async () => {
-          await updateNativeBalance();
-          await updateSupportedTokens();
-        });
-    } catch (error) {
-      console.error("Error approving token:", error);
-      toast.error("Approval failed");
-    } finally {
-      setIsLoadingApproval(false);
-    }
-  };
-
-  const handleDeposit = async () => {
+  const handleDepositWrapper = async () => {
     if (!address) {
       toast.error("Please connect your wallet");
       return;
     }
-
     if (chainId !== somniaTestnet.id) {
       toast.error("Please switch to Somnia Testnet");
       return;
     }
-
-    if (!selectedToken) {
-      toast.error("Please select a token");
+    if (selectedToken && parseFloat(depositAmount) < parseFloat(convertWeiToEther(selectedToken.minDeposit))) {
+      toast.warning("Deposit amount can't be less than " + convertWeiToEther(selectedToken.minDeposit));
       return;
     }
-
-    if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
-
-    if (
-      parseFloat(depositAmount) <
-      parseFloat(convertWeiToEther(selectedToken.minDeposit))
-    ) {
-      toast.warning(
-        "Deposit amount can't be less than " +
-        convertWeiToEther(selectedToken.minDeposit),
-      );
-      return;
-    }
-
-    if (
-      parseFloat(depositAmount) >
-      parseFloat(convertWeiToEther(selectedToken.balance))
-    ) {
+    if (selectedToken && parseFloat(depositAmount) > parseFloat(convertWeiToEther(selectedToken.balance))) {
       toast.warning("You don't have enough balance to deposit");
       return;
     }
-
-    try {
-      let value = BigInt(0);
-      let amountDepositing = BigInt(0);
-
-      if (
-        selectedToken.address === "0x0000000000000000000000000000000000000000"
-      ) {
-        value = parseEther(depositAmount);
-        amountDepositing = BigInt(0);
-      } else {
-        amountDepositing = parseUnits(depositAmount, selectedToken.decimals);
-        value = BigInt(0);
-      }
-
-      const res = depositToken({
-        abi: YoloABIMultiToken,
-        address: process.env
-          .NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS as `0x${string}`,
-        functionName: "deposit",
-        args: [selectedToken.address as `0x${string}`, amountDepositing],
-        value: value,
-      });
-
-      toast
-        .promise(res, {
-          pending: "Deposit processing..",
-          success: "Deposit sent successfully! Waiting for confirmation...",
-          error: "Deposit failed to send. 🤯",
-        })
-        .then((txHash) => {
-          setDepositTxHash(txHash);
-        });
-    } catch (error) {
-      console.error("Error depositing:", error);
-      toast.error("Deposit failed");
-    }
+    handleDeposit();
   };
-
-  useEffect(() => {
-    if (supportedTokens.length > 0) {
-      if (selectedToken) {
-        const selectedIndex = supportedTokens.find(
-          (token) =>
-            token.address.toLowerCase() === selectedToken.address.toLowerCase(),
-        );
-        if (selectedIndex) {
-          setSelectedToken(selectedIndex);
-        } else {
-          setSelectedToken(supportedTokens[0]);
-        }
-      } else {
-        setSelectedToken(supportedTokens[0]);
-      }
-    }
-  }, [supportedTokens]);
 
   const currencySymbol = selectedToken ? getTokenSymbolByAddress(selectedToken.address) : "";
 
@@ -345,10 +165,8 @@ const RaffleDeposit = () => {
       <div className="flex flex-col h-full gap-4 p-4 justify-between text-retro-black">
         <div>
           <div className="flex justify-center text-sm mb-4 tracking-tighter">
-            <div className="bg-retro-gray-3 text-retro-black px-2 py-1 border border-retro-gray-4">
-              Your Deposit: {userDeposit} {currencySymbol}
-            </div>
-            {selectedToken?.address !== "0x0000000000000000000000000000000000000000" && needsApproval() && (
+            <RaffleUserDeposit userTotalDeposit={userDeposit} symbol={currencySymbol} />
+            {selectedToken?.address !== NATIVE_TOKEN_ADDRESS && needsApproval() && (
               <div className="flex items-center gap-3">
                 <Switch id="enable-feature" checked={unlimitedApproval} onCheckedChange={setUnlimitedApproval} />
                 <Label htmlFor="enable-feature">Unlimited Approval</Label>
@@ -376,7 +194,7 @@ const RaffleDeposit = () => {
             placeholder="0"
             type="number"
             value={depositAmount}
-            onChange={(e) => setDepositAmount(e.target.value)}
+            onChange={handleInputChange}
           />
           <span className="mt-10 text-[24px] font-bold">({currencySymbol})</span>
         </div>
@@ -409,10 +227,11 @@ const RaffleDeposit = () => {
           </RetroButton>
         ) : (
           <RetroButton
-            onClick={handleDeposit}
+            onClick={handleDepositWrapper}
             type="button"
             className="w-full"
             disabled={
+              isDeadlinePassed ||
               !depositAmount ||
               isDepositing ||
               !!inputError ||
@@ -420,7 +239,7 @@ const RaffleDeposit = () => {
                 poolStatus !== PoolStatus.DEPOSIT_IN_PROGRESS)
             }
           >
-            Deposit
+            {isDeadlinePassed ? "Entries Closed" : "Deposit"}
           </RetroButton>
         )}
       </div>

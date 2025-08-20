@@ -1,13 +1,18 @@
+
 // src/app/raffle/[id]/page.tsx
 'use client';
+
 import React from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import RaffleCard from '@/components/raffle/RaffleCard';
-import RaffleDeposit from '@/components/raffle/RaffleDeposit';
+import useGetRaffleDetails from '@/api/useGetRaffleDetails'; // Import the real hook
+
+// Core components for the page
+import RaffleDetailsCard from '@/views/raffle/RaffleDetailsCard';
 import WinnerInfo from '@/components/raffle/WinnerInfo';
 import RaffleHistory from '@/components/raffle/RaffleHistory';
-import { useGetPoolById } from '@/api/useGetPoolById'; // Import the efficient hook
+import RaffleDeposit from '@/components/raffle/RaffleDeposit';
+
+// UI chrome and layout components
 import RetroPanel from '@/components/customized/RetroPanel';
 import {
   Breadcrumb,
@@ -17,82 +22,76 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import RaffleCardSkeleton from '@/skeleton/RaffleCardSkeleton';
-import RaffleDepositSkeleton from '@/skeleton/RaffleDepositSkeleton';
-import WinnerInfoSkeleton from '@/skeleton/WinnerInfoSkeleton';
-import RaffleHistorySkeleton from '@/skeleton/RaffleHistorySkeleton';
-import Deposit from '@/views/magic-earn/Deposit';
+import RaffleCardSkeleton from '@/skeleton/RaffleCardSkeleton'; // Import skeleton for loading state
 
+const RaffleDetailPage = ({ params }: { params: { id: string } }) => {
+  const { data: raffle, isLoading, isError } = useGetRaffleDetails(params.id); // Use the hook to fetch data
 
-const RafflePage = () => {
-  const params = useParams();
-  const id = params.id as string;
-
-  const { data: raffleData, isLoading: loading, isError } = useGetPoolById(id);
-
+  // Create the breadcrumb navigation element
   const breadcrumb = (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/raffle" className='text-white font-thin'>Raffles</Link>
+            <Link href="/raffle" className="text-white font-thin">Raffles</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator className='text-white' />
+        <BreadcrumbSeparator className="text-white" />
         <BreadcrumbItem>
-          <BreadcrumbPage className='text-white font-extrabold'>Raffle #{id}</BreadcrumbPage>
+          <BreadcrumbPage className="text-white font-extrabold">Raffle #{params.id}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <RetroPanel title="Loading..." headerContent={breadcrumb}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+      <RetroPanel title="Raffle Details" headerContent={breadcrumb} className='flex justify-center bg-green-700 h-fit max-w-[100%] w-[100%] '>
+        <div className="grid grid-cols-3 gap-4 p-2 max-w-[100%]">
+          <div className="col-span-2 space-y-4">
             <RaffleCardSkeleton />
           </div>
-          <div className="space-y-8">
-            <RaffleDepositSkeleton />
-            <WinnerInfoSkeleton />
-            <RaffleHistorySkeleton />
+          <div className="space-y-6">
+            <RaffleCardSkeleton />
           </div>
         </div>
       </RetroPanel>
     );
   }
 
-  if (isError || !raffleData) {
+  if (isError || !raffle) {
     return (
-      <RetroPanel title="Not Found" headerContent={breadcrumb} className='bg-red-700'>
-        <div className="flex justify-center items-center h-64">
-          <div className="text-2xl font-bold text-white">Raffle not found.</div>
+      <RetroPanel title="Raffle Details" headerContent={breadcrumb} className='flex justify-center bg-green-700 h-fit max-w-[100%] w-[100%] '>
+        <div className="text-center text-retro-black py-16">
+          <p className="text-2xl font-bold mb-2">Raffle not found!</p>
+          <p>Could not load details for raffle #{params.id}.</p>
+
         </div>
       </RetroPanel>
     );
   }
 
+  // Success State: Display the fully rendered page within the RetroPanel
   return (
-    <RetroPanel title="Raffle Details" headerContent={breadcrumb} className='bg-green-700'>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
-        <div className="lg:col-span-2 space-y-4">
-          <RaffleCard raffle={raffleData} showParticipateButton={false} showExtraInfo={true} />
-          <WinnerInfo raffle={raffleData} />
-        </div>
-        {/* Right column setup for proportional height */}
-        <div className="flex flex-col gap-4">
-          {/* Add flex-grow to this component to make it take up available space */}
-          <div className="flex-grow">
-            <RaffleDeposit />
+      <RetroPanel title="Raffle Details" headerContent={breadcrumb} className='flex justify-center bg-green-700 h-fit max-w-[100%] w-[100%] '>
+        <div className="grid grid-cols-3 gap-4 p-2 max-w-[100%]">
+          {/* Column 1: Core Raffle Info */}
+          <div className="col-span-2 space-y-4">
+            <WinnerInfo raffle={raffle} />
+            <RaffleDetailsCard raffle={raffle} />
           </div>
-          <div>
-            <RaffleHistory poolId={raffleData.id} />
+          {/* Column 2: User-specific Info & Actions */}
+          <div className="space-y-6">
+            <RaffleDeposit depositDeadline={raffle.depositDeadline} />
           </div>
         </div>
-      </div>
-    </RetroPanel>
+        {/* Full-width Section for Activities */}
+        <div className="mt-2">
+          <RaffleHistory raffle={raffle} />
+        </div>
+      </RetroPanel>
   );
 };
 
-export default RafflePage;
+export default RaffleDetailPage;
+

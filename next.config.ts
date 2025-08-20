@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://api.playsone.xyz/:path*",
+      },
+    ];
+  },
   webpack: (config, { isServer, dev }) => {
     // Only apply this configuration if not using Turbopack
     if (!dev || process.env.TURBOPACK !== "1") {

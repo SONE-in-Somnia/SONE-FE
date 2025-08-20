@@ -1241,14 +1241,6 @@ contract Kuro is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
-     * @notice Set the total prize for the raffle
-     * @param _newPrize The new total prize
-     */
-    function setTotalPrize(uint256 _newPrize) external onlyOwner {
-        totalPrize = _newPrize;
-    }
-
-    /**
      * @notice Check if a user has withdrawn all their deposits in a specific round
      * @param roundId The round ID to check
      * @param user The user address to check

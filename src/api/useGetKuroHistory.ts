@@ -38,9 +38,6 @@ export const useGetKuroHistory = () => {
         {
           ...params,
         },
-        {
-          timeout: 30000,
-        }
       );
       return data;
     },
