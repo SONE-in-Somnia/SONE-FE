@@ -29,7 +29,7 @@ const RetroFrame: React.FC<RetroFrameProps> = ({ children, className, title }) =
           </button>
         </div>
       </div>
-      <div className="bg-retro-gray p-4">{children}</div>
+      <div className="bg-retro-black p-4">{children}</div>
     </div>
   );
 };

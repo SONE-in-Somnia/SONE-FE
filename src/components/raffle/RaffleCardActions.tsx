@@ -7,7 +7,6 @@ const RaffleCardActions = ({ handleParticipateClick, isCompleted }: { handlePart
     <RetroButton
       onClick={handleParticipateClick}
       className="w-full"
-      disabled={isCompleted}
     >
       {isCompleted ? 'View Results' : 'Participate'}
     </RetroButton>

@@ -1,20 +1,29 @@
 // src/components/raffle/RaffleCardStats.tsx
 import React from 'react';
-import ProgressBar from '@/components/ui/ProgressBar';
+import Countdown from '@/components/Countdown';
 
-const RaffleCardStats = ({ isCompleted, drawTime, participantCount, startTime }: { isCompleted: boolean, drawTime: string, participantCount: number, startTime: string }) => (
-  <div className="mb-6 text-center flex flex-col justify-between ">
-    <div className='flex items-center justify-between border-dotted border-b-4 border-white pb-1'>
-      <p className="text-sm font-bold">Participants</p>
-      <p className="text-md">{participantCount.toLocaleString()}</p>
+import { cn } from "@/lib/utils";
+
+const RaffleCardStats = ({ isCompleted, drawTime, participantCount }: { isCompleted: boolean, drawTime: number, participantCount: number }) => (
+  <div className={cn("mb-6 text-center flex flex-col justify-between ", isCompleted && "text-white")}>
+    <div className='flex items-center justify-between border-dotted border-b-4 border-retro-gray-2 pb-1'>
+      <p className="text-sm">Investors</p>
+      <p className="text-md font-bold">{participantCount !== undefined ? participantCount.toLocaleString
+      () : '-'}</p>
     </div>
-    <div className="mt-4">
-      <p className="text-sm font-bold">Time Remaining</p>
+    <div className="">
+      {!isCompleted && (
+        <p className="text-sm">Time Remaining</p>
+      )}
       <div className="text-md mt-2 relative">
-        <ProgressBar startTime={Number(startTime)} endTime={Number(drawTime)} />
+        {drawTime !== undefined && !isCompleted ? (
+          <Countdown endTime={Number(drawTime) * 1000} />
+        ) : (
+          ''
+        )}
         {isCompleted && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-white font-bold z-2">Raffle Ended</span>
+            <span className="text-white font-bold z-2 mb-6 bg-retro-orange">Raffle Ended</span>
           </div>
         )}
       </div>

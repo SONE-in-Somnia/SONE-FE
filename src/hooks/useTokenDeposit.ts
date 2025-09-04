@@ -132,6 +132,12 @@ export const useTokenDeposit = ({
         value: value,
       });
 
+    // --- DEBUG START ---
+      console.log("--- Preparing Deposit Transaction ---");
+      // console.log("Arguments for smart contract:", depositArgs);
+    // --- DEBUG END ---
+
+
       toast.promise(res, {
         pending: "Deposit processing..",
         success: "Deposit Success. 👌",
@@ -142,7 +148,11 @@ export const useTokenDeposit = ({
         }
       });
     } catch (error) {
+      // --- DEBUG START ---
+      console.error("!!! DEPOSIT FAILED !!!");
       console.error("Error depositing:", error);
+    // --- DEBUG END ---
+
       toast.error("Deposit failed");
     }
   };

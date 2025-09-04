@@ -1,0 +1,62 @@
+specVersion: 0.0.5
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: PrizePoolManager
+    network: SomniaTestnet
+    source:
+      address: "0xCB3Aa1464AcE469294B3108Ec690560d61261440"
+      abi: PrizePoolManager
+      startBlock: 156306896
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Raffle
+      abis:
+        - name: PrizePoolManager
+          file: PrizePoolManager/PrizePoolManager.json
+      eventHandlers:
+        - event: PrizePoolCreated(indexed address,indexed address,indexed
+            address,string,string,uint256,uint256)
+          handler: handlePrizePoolCreated
+      file: PrizePoolManager/PrizePoolManager.wasm
+templates:
+  - kind: ethereum/contract
+    name: PrizePool
+    network: SomniaTestnet
+    source:
+      abi: PrizePool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Raffle
+        - Player
+        - RaffleDeposit
+        - Withdrawal
+        - WinnerDrawnEvent
+        - DepositDeadlineUpdatedEvent
+        - DrawTimeUpdatedEvent
+        - DepositedToYieldProtocolEvent
+        - WithdrawnFromYieldProtocolEvent
+      abis:
+        - name: PrizePool
+          file: PrizePool/PrizePool.json
+        - name: ERC20
+          file: PrizePool/ERC20.json
+      eventHandlers:
+        - event: Deposited(indexed address,uint256)
+          handler: handleDeposited
+        - event: WinnerDrawn(indexed address)
+          handler: handleWinnerDrawn
+        - event: Claimed(indexed address,uint256)
+          handler: handleClaimed
+        - event: DepositDeadlineUpdated(uint256,uint256)
+          handler: handleDepositDeadlineUpdated
+        - event: DrawTimeUpdated(uint256,uint256)
+          handler: handleDrawTimeUpdated
+      file: PrizePoolManager/PrizePoolManager.wasm

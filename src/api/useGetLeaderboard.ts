@@ -17,7 +17,7 @@ const useGetLeaderboard = () => {
         queryKey: ["leaderboard"],
         queryFn: getLeaderboard,
         // Optional: Refetch the data every 30 seconds to keep it fresh
-        refetchInterval: 30000,
+        // refetchInterval: 30000,
     });
 };
 

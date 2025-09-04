@@ -64,8 +64,8 @@ export class Raffle extends Entity {
     this.set("title", Value.fromString(value));
   }
 
-  get prize(): string {
-    let value = this.get("prize");
+  get symbol(): string {
+    let value = this.get("symbol");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -73,12 +73,25 @@ export class Raffle extends Entity {
     }
   }
 
-  set prize(value: string) {
-    this.set("prize", Value.fromString(value));
+  set symbol(value: string) {
+    this.set("symbol", Value.fromString(value));
   }
 
-  get endsAt(): BigInt {
-    let value = this.get("endsAt");
+  get tokenAddress(): Bytes {
+    let value = this.get("tokenAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set tokenAddress(value: Bytes) {
+    this.set("tokenAddress", Value.fromBytes(value));
+  }
+
+  get depositDeadline(): BigInt {
+    let value = this.get("depositDeadline");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -86,12 +99,12 @@ export class Raffle extends Entity {
     }
   }
 
-  set endsAt(value: BigInt) {
-    this.set("endsAt", Value.fromBigInt(value));
+  set depositDeadline(value: BigInt) {
+    this.set("depositDeadline", Value.fromBigInt(value));
   }
 
-  get ticketsSold(): BigInt {
-    let value = this.get("ticketsSold");
+  get drawTime(): BigInt {
+    let value = this.get("drawTime");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -99,47 +112,21 @@ export class Raffle extends Entity {
     }
   }
 
-  set ticketsSold(value: BigInt) {
-    this.set("ticketsSold", Value.fromBigInt(value));
+  set drawTime(value: BigInt) {
+    this.set("drawTime", Value.fromBigInt(value));
   }
 
-  get ticketPrice(): BigInt {
-    let value = this.get("ticketPrice");
+  get totalDeposits(): BigDecimal {
+    let value = this.get("totalDeposits");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigInt();
+      return value.toBigDecimal();
     }
   }
 
-  set ticketPrice(value: BigInt) {
-    this.set("ticketPrice", Value.fromBigInt(value));
-  }
-
-  get prizePool(): BigInt {
-    let value = this.get("prizePool");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set prizePool(value: BigInt) {
-    this.set("prizePool", Value.fromBigInt(value));
-  }
-
-  get status(): string {
-    let value = this.get("status");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set status(value: string) {
-    this.set("status", Value.fromString(value));
+  set totalDeposits(value: BigDecimal) {
+    this.set("totalDeposits", Value.fromBigDecimal(value));
   }
 
   get winner(): string | null {
@@ -159,39 +146,8 @@ export class Raffle extends Entity {
     }
   }
 
-  get deposits(): DepositLoader {
-    return new DepositLoader("Raffle", this.get("id")!.toString(), "deposits");
-  }
-}
-
-export class Player extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save Player entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.STRING,
-        `Entities of type Player must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
-      );
-      store.set("Player", id.toString(), this);
-    }
-  }
-
-  static loadInBlock(id: string): Player | null {
-    return changetype<Player | null>(store.get_in_block("Player", id));
-  }
-
-  static load(id: string): Player | null {
-    return changetype<Player | null>(store.get("Player", id));
-  }
-
-  get id(): string {
-    let value = this.get("id");
+  get status(): string {
+    let value = this.get("status");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -199,29 +155,16 @@ export class Player extends Entity {
     }
   }
 
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
+  set status(value: string) {
+    this.set("status", Value.fromString(value));
   }
 
-  get address(): Bytes {
-    let value = this.get("address");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
+  get deposit(): DepositLoader {
+    return new DepositLoader("Raffle", this.get("id")!.toString(), "deposit");
   }
 
-  set address(value: Bytes) {
-    this.set("address", Value.fromBytes(value));
-  }
-
-  get deposits(): DepositLoader {
-    return new DepositLoader("Player", this.get("id")!.toString(), "deposits");
-  }
-
-  get rafflesWon(): RaffleLoader {
-    return new RaffleLoader("Player", this.get("id")!.toString(), "rafflesWon");
+  get deposit(): PlayerLoader {
+    return new PlayerLoader("Raffle", this.get("id")!.toString(), "deposit");
   }
 }
 
@@ -290,17 +233,17 @@ export class Deposit extends Entity {
     this.set("player", Value.fromString(value));
   }
 
-  get amount(): BigInt {
+  get amount(): BigDecimal {
     let value = this.get("amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigInt();
+      return value.toBigDecimal();
     }
   }
 
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
+  set amount(value: BigDecimal) {
+    this.set("amount", Value.fromBigDecimal(value));
   }
 
   get timestamp(): BigInt {
@@ -314,6 +257,76 @@ export class Deposit extends Entity {
 
   set timestamp(value: BigInt) {
     this.set("timestamp", Value.fromBigInt(value));
+  }
+}
+
+export class Player extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Player entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Player must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+      );
+      store.set("Player", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): Player | null {
+    return changetype<Player | null>(store.get_in_block("Player", id));
+  }
+
+  static load(id: string): Player | null {
+    return changetype<Player | null>(store.get("Player", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get totalDeposits(): BigDecimal {
+    let value = this.get("totalDeposits");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalDeposits(value: BigDecimal) {
+    this.set("totalDeposits", Value.fromBigDecimal(value));
+  }
+
+  get raffles(): Array<string> {
+    let value = this.get("raffles");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set raffles(value: Array<string>) {
+    this.set("raffles", Value.fromStringArray(value));
+  }
+
+  get deposits(): DepositLoader {
+    return new DepositLoader("Player", this.get("id")!.toString(), "deposits");
   }
 }
 
@@ -335,7 +348,7 @@ export class DepositLoader extends Entity {
   }
 }
 
-export class RaffleLoader extends Entity {
+export class PlayerLoader extends Entity {
   _entity: string;
   _field: string;
   _id: string;
@@ -347,8 +360,8 @@ export class RaffleLoader extends Entity {
     this._field = field;
   }
 
-  load(): Raffle[] {
+  load(): Player[] {
     let value = store.loadRelated(this._entity, this._id, this._field);
-    return changetype<Raffle[]>(value);
+    return changetype<Player[]>(value);
   }
 }

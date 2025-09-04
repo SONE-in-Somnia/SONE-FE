@@ -1,3 +1,4 @@
+const ANKR_SOMNIA_TESTNET_RPC_URL = process.env.NEXT_PUBLIC_ANKR_SOMNIA_TESTNET_RPC_URL
 export const somniaTestnet = {
   id: 50312,
   name: "Somnia Testnet",

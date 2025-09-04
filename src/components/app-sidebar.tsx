@@ -55,12 +55,12 @@ const data = {
       iconName: "trophy",
       group: "games",
     },
-    {
-      title: "MY PROFILE",
-      url: "/myprofile",
-      iconName: "rocket",
-      group: "social",
-    },
+    // {
+    //   title: "MY PROFILE",
+    //   url: "/myprofile",
+    //   iconName: "rocket",
+    //   group: "social",
+    // },
   ],
 };
 

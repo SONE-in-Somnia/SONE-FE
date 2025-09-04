@@ -11,6 +11,7 @@ import SignInPrompt from "@/components/leaderboard/SignInPrompt";
 import UserProfileCard from "@/components/leaderboard/UserProfileCard";
 import { useAppKitAccount } from "@reown/appkit/react";
 import useGetLeaderboard from "@/api/useGetLeaderboard"; // Import the new hook
+import LeaderboardAnimation from "@/components/leaderboard/LeaderboardAnimation";
 
 const LeaderboardView = () => {
     const { address, isConnected } = useAppKitAccount();
@@ -22,7 +23,7 @@ const LeaderboardView = () => {
     });
 
     // Use the new hook for fetching leaderboard data
-    const { data: leaderboard = [], isLoading: isLoadingLeaderboard, isError: leaderboardError } = useGetLeaderboard();
+    const { data: leaderboard = [], isLoading: isLoadingLeaderboard, isError: leaderboardError, isFetching } = useGetLeaderboard();
 
     const handleSignInSuccess = (newSignature: string) => {
         setSignature(newSignature);
@@ -44,21 +45,18 @@ const LeaderboardView = () => {
         ? formattedLeaderboardData.find(player => player.address.toLowerCase() === address?.toLowerCase())
         : undefined;
 
-    if (isLoadingLeaderboard) {
+    if (isLoadingLeaderboard && leaderboard.length === 0) {
         return <RetroPanel title="Leaderboard" className="bg-retro-orange text-center">Loading...</RetroPanel>;
     }
 
     return (
         <RetroPanel title="🏆 LEADERBOARD 🏆" className="bg-retro-orange h-fit">
+            {isFetching && leaderboard.length > 0 && (
+                <div className="text-center text-sm text-gray-500">Updating leaderboard...</div>
+            )}
             <div className="mx-auto px-3 py-8 font-pixel-operator-mono">
-                <div className="mb-5 h-[105px] overflow-hidden">
-                    <Image
-                        src="/images/mazeGIF.gif"
-                        alt="Leaderboard Banner"
-                        width={1200}
-                        height={400}
-                        className="w-full"
-                    />
+                <div className="mb-5 h-[120px] overflow-hidden">
+                    <LeaderboardAnimation />
                 </div>
                 <div className="mb-5">
                     {isConnected && signature ? (

@@ -11,7 +11,7 @@ const SpotlightGames = () => {
   const router = useRouter();
   const games = [
     { name: "Wheely Wheely", image: "/images/wheel1.jpeg", link: "/wheely-wheely" },
-    { name: "Coming Sone", image: "/images/wheel3.jpeg", link: "#" },
+    { name: "Raffle on Sone", image: "/images/wheel3.jpeg", link: "/raffle" },
   ];
 
   const warningText = `🚨 WARNING: These games may drive you go crazy,

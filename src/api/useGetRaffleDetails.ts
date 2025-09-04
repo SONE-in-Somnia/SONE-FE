@@ -2,66 +2,133 @@
 // src/api/useGetRaffleDetails.ts
 
 // Line 1: Import necessary libraries
-import { useQuery } from "@tanstack/react-query";
-import request, { gql } from "graphql-request";
-import { RaffleDetailsType } from "@/types/raffle"; // Assuming this type definition exists
+import { useQuery } from '@tanstack/react-query';
+import request, { gql } from 'graphql-request';
+import { RaffleDetailsType, PlayerRaffleStatsType, RecentActivity, RaffleStatus } from '@/types/raffle';
 
-// Line 2: Define the hook function
-const useGetRaffleDetails = (poolId: string) => {
-  // Line 3: Use the useQuery hook from TanStack Query
-  return useQuery<RaffleDetailsType>({
-    // Line 4: Define a unique key for this query
-    queryKey: ["GET_RAFFLE_DETAILS", poolId],
-    // Line 5: Define the asynchronous function to fetch data
+// Define interfaces for the GraphQL responses
+interface RaffleQueryResult {
+  raffle: {
+    id: string;
+    name: string;
+    symbol: string;
+    createdAt: string;
+    depositDeadline: string;
+    drawTime: string;
+    tokenAddress: string;
+    status: string;
+    totalDeposits: string;
+    totalWeightedTickets: string;
+    participantCount: string;
+    winner: string;
+    totalPrizePool: string;
+    decimals: string;
+    activities: {
+      player: { id: string };
+      amount: string;
+      timestamp: string;
+      id: string;
+    }[];
+  };
+}
+
+interface PlayerStatsQueryResult {
+  playerRaffleStats: {
+    totalDepositedInRaffle: string;
+    weightedTicketsInRaffle: string;
+  } | null;
+}
+
+const useGetRaffleDetails = (poolId: string, userAddress?: string) => {
+  return useQuery<RaffleDetailsType | null>({
+    queryKey: ['GET_RAFFLE_DETAILS', poolId, userAddress],
     queryFn: async () => {
-      // Line 6: Define the GraphQL query
-      const query = gql`
-        query GetRaffleDetails($poolId: String!) {
-          pool(id: $poolId) {
+      const endpoint = process.env.NEXT_PUBLIC_THE_GRAPH || '';
+
+      const raffleQuery = gql`
+        query GetRaffleDetails($poolId: ID!) {
+          raffle(id: $poolId) {
             id
-            depositDeadline
             name
-            poolAddress
             symbol
-            startTime
+            createdAt
+            depositDeadline
             drawTime
             tokenAddress
             status
             totalDeposits
+            totalWeightedTickets
             participantCount
             winner
-            totalPrize
-            userTotalDeposit
-            activities {
-              user
-              amount
-              timestamp
-              transactionHash
+            totalPrizePool
+            decimals
+            activities(first: 10, orderBy: timestamp, orderDirection: desc) {
+              ... on RaffleDeposit {
+                player {
+                  id
+                }
+                amount
+                timestamp
+                id
+              }
             }
           }
         }
       `;
 
-      // Line 7: Get the API URL from environment variables
-      const url = process.env.NEXT_PUBLIC_THE_GRAPH || "";
+      const playerStatsQuery = gql`
+        query GetPlayerRaffleStats($playerId: ID!) {
+          playerRaffleStats(id: $playerId) {
+            totalDepositedInRaffle
+            weightedTicketsInRaffle
+            winChance
+          }
+        }
+      `;
 
-      // Line 8: Make the API request using graphql-request
-      const res: { pool: RaffleDetailsType } = await request({
-        url: url,
-        document: query,
-        variables: { poolId }, // Pass the poolId as a variable
-        requestHeaders: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
-        },
-      });
+      const rafflePromise = request<RaffleQueryResult>(endpoint, raffleQuery, { poolId });
 
-      // Line 9: Return the fetched pool data
-      return res.pool;
+      const promises: [Promise<RaffleQueryResult>, Promise<PlayerStatsQueryResult | null>] = [rafflePromise, Promise.resolve(null)];
+      if (userAddress) {
+        const playerId = `${userAddress.toLowerCase()}-${poolId}`;
+        promises[1] = request<PlayerStatsQueryResult>(endpoint, playerStatsQuery, { playerId });
+      }
+
+      const [raffleResult, playerStatsResult] = await Promise.all(promises);
+
+      if (!raffleResult.raffle) {
+        return null;
+      }
+
+      const playerStats: PlayerRaffleStatsType = playerStatsResult?.playerRaffleStats ?
+        {
+            ...playerStatsResult.playerRaffleStats,
+            winChance: '0', // You might want to calculate this value
+        } : {
+        totalDepositedInRaffle: '0',
+        weightedTicketsInRaffle: '0',
+        winChance: '0',
+      };
+
+      const activities: RecentActivity[] = raffleResult.raffle.activities.map((act) => ({
+        player: act.player.id,
+        amount: act.amount,
+        timestamp: act.timestamp,
+        transactionHash: act.id.split('-')[0],
+      }));
+
+      const result: RaffleDetailsType = {
+        ...raffleResult.raffle,
+        status: raffleResult.raffle.status as RaffleStatus,
+        totalPrizePool: raffleResult.raffle.totalPrizePool,
+        userTotalDeposit: playerStats.totalDepositedInRaffle,
+        activities,
+      };
+
+      return result;
     },
-    // Line 10: Ensure the query only runs if poolId is provided
     enabled: !!poolId,
   });
 };
 
-// Line 11: Export the hook
 export default useGetRaffleDetails;

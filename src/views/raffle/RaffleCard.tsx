@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Window from '@/views/home-v2/components/Window';
-import { useGetWinChance } from '@/api/useGetWinChance';
 import { PoolType } from '@/types/raffle';
 import RaffleCardHeader from '@/components/raffle/RaffleCardHeader';
 import RaffleCardStats from '@/components/raffle/RaffleCardStats';
@@ -11,30 +10,32 @@ import RaffleCardTVL from '@/components/raffle/RaffleCardTVL';
 import RaffleCardPrizeInfo from '@/components/raffle/RaffleCardPrizeInfo';
 import RaffleCardActions from '@/components/raffle/RaffleCardActions';
 import { formatEthereumAddress } from '@/utils/string'; // Import the formatting utility
+import styles from '@/styles/WinnerInfo.module.css';
 
 // Define the component's props
 type RaffleCardProps = {
-  raffle: PoolType & { totalPrize?: string }; // Allow an optional totalPrize
+  raffle: PoolType; 
+  // Add optional props for detailed data
   showParticipateButton?: boolean;
   showExtraInfo?: boolean;
 };
 
-const RaffleCard = ({ raffle, showParticipateButton = true, showExtraInfo = false }: RaffleCardProps) => {
+const RaffleCard = ({
+  raffle,
+  showParticipateButton = true,
+  showExtraInfo = false }: RaffleCardProps) => {
   const router = useRouter();
-  const { formattedWinChance, isLoadingWinChance } = useGetWinChance();
   
   const isRaffleCompletedByStatus = raffle.status === 'COMPLETED';
   const [isCompleted, setIsCompleted] = useState(isRaffleCompletedByStatus);
 
   const handleParticipateClick = () => {
-    router.push(`/raffle/${raffle.id}`);
+    router.push(`/raffle/${raffle.prizePoolAddress}`);
   };
 
-  const totalDeposits = parseFloat(raffle.totalDeposits);
-  // Use the explicit totalPrize if available, otherwise fall back to totalDeposits
-  const prizeAmount = raffle.totalPrize ? parseFloat(raffle.totalPrize) : totalDeposits;
-  const drawTime = Number(raffle.drawTime);
+  const drawTime = Number(raffle.withdrawalTime);
 
+  // check COMPLETED
   useEffect(() => {
     if (isRaffleCompletedByStatus) {
       setIsCompleted(true);
@@ -55,15 +56,19 @@ const RaffleCard = ({ raffle, showParticipateButton = true, showExtraInfo = fals
   }, [drawTime, isRaffleCompletedByStatus]);
 
   return (
-    <Window title="🎟️ CURRENT RAFFLE 🎟️" className='h-fit'>
+    <Window
+      title="🎟️ CURRENT RAFFLE 🎟️"
+      className='h-fit'
+      contentClassName={isCompleted ? "bg-retro-black" : ""}
+    >
       <div className="p-4 flex flex-col h-full overflow-hidden">
-        <RaffleCardHeader name={raffle.name} />
+        <RaffleCardHeader name={raffle.name} isCompleted={isCompleted} />
         
         {/* Conditionally render the winner's address */}
         {isCompleted && (
           <div className="text-center my-4">
             <p className="text-lg text-retro-gray-2 font-bold">Winner's Address</p>
-            <p className="text-xl font-pixel-operator-mono-bold text-retro-blue break-all">
+            <p className={`${styles.gifTextEffect} text-xl font-pixel-operator-mono-bold text-retro-gray-2`}>
               {formatEthereumAddress(raffle.winner)}
             </p>
           </div>
@@ -72,19 +77,15 @@ const RaffleCard = ({ raffle, showParticipateButton = true, showExtraInfo = fals
         <div className="grid grid-cols-2 gap-4 mt-10">
           <RaffleCardStats 
             isCompleted={isCompleted} 
-            drawTime={raffle.drawTime} 
-            participantCount={raffle.participantCount} 
-            startTime={raffle.startTime} 
+            drawTime={raffle.withdrawalTime} 
+            participantCount={raffle.participantCount}
           />
-          <RaffleCardTVL totalDeposits={totalDeposits} symbol={raffle.symbol} />
+          <RaffleCardTVL totalDeposits={raffle.totalDeposits} symbol={raffle.symbol} />
         </div>
 
         {showExtraInfo && (
           <RaffleCardPrizeInfo 
-            totalDeposits={prizeAmount} // Use the determined prize amount
             symbol={raffle.symbol} 
-            isLoadingWinChance={isLoadingWinChance} 
-            formattedWinChance={formattedWinChance} 
           />
         )}
 

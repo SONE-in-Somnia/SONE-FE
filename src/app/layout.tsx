@@ -15,6 +15,7 @@ import HeaderMobile from "@/views/share/HeaderMobile";
 import Notifier from "@/components/customized/notifier";
 import { ToastContainer } from "react-toastify";
 import GhostCursorWrapper from "@/components/customized/GhostCursorWrapper";
+import BayerDitheringBackground from "@/components/BayerDitheringBackground";
 
 
 export const metadata: Metadata = {
@@ -74,6 +75,7 @@ export default function RootLayout({
       <body
         className={`containers relative antialiased ${pixelOperator.variable} ${pixelOperatorMono.variable} ${pixelOperatorMonoBold.variable} ${modernWarfare.variable}`}
       >
+        <BayerDitheringBackground />
         <GhostCursorWrapper />
         <noscript>
           <iframe
@@ -84,14 +86,6 @@ export default function RootLayout({
           ></iframe>
         </noscript>
         <AppContext>
-          <Image
-            src="/images/WTTIGIF.gif"
-            alt="Background"
-            layout="fill"
-            objectFit="cover"
-            quality={100}
-            className="-z-10"
-          />
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>

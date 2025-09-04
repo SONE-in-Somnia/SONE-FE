@@ -6,6 +6,7 @@ interface WindowProps {
   children: React.ReactNode;
   className?: string;
   headerClassName?: string;
+  contentClassName?: string; // New prop for inner content div
   onTitleClick?: () => void;
   showCloseButton?: boolean;
   showMinimizeButton?: boolean;
@@ -16,6 +17,7 @@ const Window: React.FC<WindowProps> = ({
   children,
   className,
   headerClassName,
+  contentClassName, // Destructure new prop
   onTitleClick,
   showCloseButton,
   showMinimizeButton,
@@ -62,7 +64,7 @@ const Window: React.FC<WindowProps> = ({
           )}
         </div>
       </div>
-      <div className="bg-retro-gray py-4 px-3 flex-grow overflow-y-auto font-pixel-operator-mono font-thin h-full">
+      <div className={cn("bg-retro-gray py-4 px-3 flex-grow overflow-y-auto font-pixel-operator-mono font-thin h-full", contentClassName)}>
         {children}
       </div>
     </div>
