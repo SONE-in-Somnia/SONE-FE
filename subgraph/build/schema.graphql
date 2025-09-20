@@ -1,0 +1,154 @@
+# subgraph/schema.graphql
+
+type Raffle @entity(immutable: true) {
+  "The address of the PrizePool contract"
+  id: ID!
+  "The name of the raffle"
+  name: String!
+  "The symbol of the raffle"
+  symbol: String!
+  "Timestamp of when the raffle was created"
+  createdAt: BigInt!
+  "Timestamp of the deposit deadline"
+  depositDeadline: BigInt!
+  "Timestamp of the draw time"
+  drawTime: BigInt!
+  "The address of the ERC20 token being deposited"
+  tokenAddress: Bytes!
+  "The current status of the raffle"
+  status: String! # "IN_PROGRESS" or "COMPLETED"
+  "Total amount deposited in the pool"
+  totalDeposits: BigDecimal!
+  "The total weighted tickets for this raffle"
+  totalWeightedTickets: BigDecimal! 
+  "The number of unique participants"
+  participantCount: BigInt!
+  "The address of the winner, stored as a hex string"
+  winner: String
+  "The list of unique participant addresses"
+  participants: [Player!]!
+  "All deposit made to in this raffle"
+  deposits: [RaffleDeposit!]! @derivedFrom(field: "raffle")
+  "The total prize pool generated from yield"
+  totalPrizePool: BigDecimal!
+  "The number of decimals for the deposit token"
+  decimals: BigInt!
+  "Stats for players in this specific raffle"
+  playerStats: [PlayerRaffleStats!]! @derivedFrom(field: "raffle")
+  "All activities related to this raffle (deposits, withdrawals, winner drawn, updates)"
+  activities: [ActivityEvent!]! @derivedFrom(field: "raffle")
+}
+
+type RaffleDeposit implements ActivityEvent @entity(immutable: true) {
+  "A unique ID, e.g., txHash-logIndex"
+  id: ID!
+  "The raffle this deposit was made to"
+  raffle: Raffle!
+  "The player who made the deposit"
+  player: Player!
+  "The amount deposited"
+  amount: BigDecimal!
+  "The weighted amount for this deposit"
+  weightedAmount: BigDecimal!
+  "Timestamp of the deposit"
+  timestamp: BigInt!
+}
+
+type Player @entity(immutable: false) {
+  "The user's wallet address"
+  id: ID!
+  "The total amount this player has deposited across all raffles"
+  totalDeposited: BigDecimal!
+  "Timestamp of the player's first deposit ever"
+  firstDepositTimestamp: BigInt!
+  "The raffles this player has participated in"
+  raffles: [Raffle!]! @derivedFrom(field: "participants")
+  "Stats for this player across different raffles"
+  raffleStats: [PlayerRaffleStats!]! @derivedFrom(field: "player")
+}
+
+type Withdrawal implements ActivityEvent @entity(immutable: true) {
+  "A unique ID, e.g., txHash-logIndex"
+  id: ID!
+  "The raffle this withdrawal was made from"
+  raffle: Raffle!
+  "The player who made the withdrawal"
+  player: Player!
+  "The amount withdrawn"
+  amount: BigDecimal!
+  "Timestamp of the withdrawal"
+  timestamp: BigInt!
+}
+
+type PlayerRaffleStats @entity(immutable: false) {
+  "Composite ID: PlayerID-RaffleID"
+  id: ID!
+  "The player associated with these stats"
+  player: Player!
+  "The raffle associated with these stats"
+  raffle: Raffle!
+  "Total amount deposited by this player in this specific raffle"
+  totalDepositedInRaffle: BigDecimal!
+  "Total weighted tickets accumulated by this player in this specific raffle"
+  weightedTicketsInRaffle: BigDecimal!
+  "Optional: Whether this player won this specific raffle"
+  wonRaffle: Boolean
+  "The calculated win chance for this player in this specific raffle"
+  winChance: BigDecimal!
+}
+
+interface ActivityEvent {
+  id: ID!
+  timestamp: BigInt!
+  raffle: Raffle!
+  player: Player! # Assuming all activities are associated with a player
+}
+
+type WinnerDrawnEvent implements ActivityEvent @entity(immutable: true) {
+  id: ID!
+  timestamp: BigInt!
+  raffle: Raffle!
+  player: Player! # The winner is the player
+  winner: String! # Specific field for this event
+}
+
+type DepositDeadlineUpdatedEvent implements ActivityEvent @entity(immutable: true) {
+  id: ID!
+  timestamp: BigInt!
+  raffle: Raffle!
+  player: Player! # The admin/owner who updated it
+  oldDepositDeadline: BigInt!
+  newDepositDeadline: BigInt!
+}
+
+type DrawTimeUpdatedEvent implements ActivityEvent @entity(immutable: true) {
+  id: ID!
+  timestamp: BigInt!
+  raffle: Raffle!
+  player: Player! # The admin/owner who updated it
+  oldDrawTime: BigInt!
+  newDrawTime: BigInt!
+}
+
+# type DepositedToYieldProtocolEvent implements ActivityEvent
+#   @entity(immutable: true) {
+#   id: ID!
+#   timestamp: BigInt!
+#   raffle: Raffle!
+#   player: Player! # The sender of the transaction (owner)
+#   amount: BigDecimal! # The amount deposited to yield protocol
+# }
+
+# type WithdrawnFromYieldProtocolEvent implements ActivityEvent
+#   @entity(immutable: true) {
+#   id: ID!
+#   timestamp: BigInt!
+#   raffle: Raffle!
+#   player: Player! # The sender of the transaction (owner)
+#   amount: BigDecimal! # The amount withdrawn from yield protocol
+# }
+
+enum RaffleStatus {
+  IN_PROGRESS
+  COMPLETED
+}

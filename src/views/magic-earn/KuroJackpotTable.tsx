@@ -14,7 +14,7 @@ import { useSearchParams } from "next/navigation";
 
 const KuroJackpotTable = () => {
   const [typeSelected, setTypeSelected] = useState<"Kuro" | "Jackpot">("Kuro");
-
+  
   return (
     <div className="flex flex-col gap-4">
       <Tabs defaultValue="all">

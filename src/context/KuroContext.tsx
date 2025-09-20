@@ -114,6 +114,15 @@ interface KuroContextProps {
     type?: "all" | "youWin",
   ) => Promise<void>;
   isFetchingKuroHistory: boolean;
+  isErrorKuroHistory: boolean;
+  allJackpotHistories: RoundHistoryResponse<JackpotRound> | null;
+  myJackpotHistories: RoundHistoryResponse<JackpotRound> | null;
+  refetchJackpotHistories: (
+    page?: number,
+    limit?: number,
+    type?: "all" | "youWin",
+  ) => Promise<void>;
+  isFetchingJackpotHistory: boolean;
   registerKuroListener: () => void;
   unRegisterKuroListener: () => void;
 }
@@ -187,6 +196,8 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
     mutateAsync: mutateAsyncJackpotHistory,
     isPending: isFetchingJackpotHistory,
   } = useGetJackpotHistory();
+    
+  const [isErrorKuroHistory, setIsErrorKuroHistory] = useState(false);
 
   const handleClaimPrizes = async (
     roundId: number,
@@ -368,29 +379,34 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
     limit?: number,
     type?: "all" | "youWin",
   ) => {
-    if (type === "all" || !type) {
-      const allHistoriesData = await mutateAsyncHistory({
-        page: page,
-        type: "all",
-        limit: limit,
-      });
-
-      if (allHistoriesData.success) {
-        setAllHistories(allHistoriesData);
-      }
-    }
-
-    if (type === "youWin" || !type) {
-      const myWinHistoriesData = await mutateAsyncHistory({
-        page: page,
-        type: "youWin",
-        limit: limit,
-        address: address,
-      });
-
-      if (myWinHistoriesData.success) {
-        setMyWinHistories(myWinHistoriesData);
-      }
+    try {
+        setIsErrorKuroHistory(false);
+        if (type === "all" || !type) {
+            const allHistoriesData = await mutateAsyncHistory({
+              page: page,
+              type: "all",
+              limit: limit,
+            });
+      
+            if (allHistoriesData.success) {
+              setAllHistories(allHistoriesData);
+            }
+          }
+      
+          if (type === "youWin" || !type) {
+            const myWinHistoriesData = await mutateAsyncHistory({
+              page: page,
+              type: "youWin",
+              limit: limit,
+              address: address,
+            });
+      
+            if (myWinHistoriesData.success) {
+              setMyWinHistories(myWinHistoriesData);
+            }
+          }
+    } catch (error) {
+        setIsErrorKuroHistory(true);
     }
   };
 
@@ -550,6 +566,11 @@ export const KuroProvider: React.FC<KuroProviderProps> = ({ children }) => {
     poolStatus,
     setPoolStatus,
     isFetchingKuroHistory,
+    isErrorKuroHistory,
+    allJackpotHistories,
+    myJackpotHistories,
+    refetchJackpotHistories,
+    isFetchingJackpotHistory,
     registerKuroListener,
     unRegisterKuroListener,
   };

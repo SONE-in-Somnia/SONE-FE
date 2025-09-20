@@ -13,6 +13,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 import HeaderMobile from "@/views/share/HeaderMobile";
 import Notifier from "@/components/customized/notifier";
+import { ToastContainer } from "react-toastify";
+import GhostCursorWrapper from "@/components/customized/GhostCursorWrapper";
+import BayerDitheringBackground from "@/components/BayerDitheringBackground";
+
 
 export const metadata: Metadata = {
   title: "SONE",
@@ -53,8 +57,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="overflow-x-hidden">
       <head>
+        <link
+          rel="preload"
+          href="/public/fonts/PixelOperator.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/public/fonts/PixelOperatorMono.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/public/fonts/PixelOperatorMono8-Bold.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
@@ -71,6 +97,8 @@ export default function RootLayout({
       <body
         className={`containers relative antialiased ${pixelOperator.variable} ${pixelOperatorMono.variable} ${pixelOperatorMonoBold.variable} ${modernWarfare.variable}`}
       >
+        <BayerDitheringBackground />
+        <GhostCursorWrapper />
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M3NX2RHQ"
@@ -80,20 +108,24 @@ export default function RootLayout({
           ></iframe>
         </noscript>
         <AppContext>
-          <Image
-            src="/images/WTTIGIF.gif"
-            alt="Background"
-            layout="fill"
-            objectFit="cover"
-            quality={100}
-            className="-z-10"
-          />
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
               <HeaderMobile />
               <div className="relative mx-auto flex w-full flex-1 flex-col gap-4 font-pixel-operator">
                 <Notifier />
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="dark"
+                />
                 <div className="p-4">{children}</div>
               </div>
             </SidebarInset>

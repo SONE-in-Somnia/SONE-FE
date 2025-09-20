@@ -1,0 +1,69 @@
+# subgraph/subgraph.yaml
+
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: PrizePoolManager
+    network: SomniaTestnet # Replace with your network
+    source:
+      address: "0xCB3Aa1464AcE469294B3108Ec690560d61261440" # Replace with your contract address
+      abi: PrizePoolManager
+      startBlock: 156306896 # Replace with the block number where the contract was deployed
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Raffle
+      abis:
+        - name: PrizePoolManager
+          file: ../src/abi/PrizePoolManager.json
+      eventHandlers:
+        - event: PrizePoolCreated(indexed address,indexed address,indexed address,string,string,uint256,uint256)
+          handler: handlePrizePoolCreated
+      file: ./src/mapping.ts
+
+# This is the template for the individual raffle pools
+templates:
+  - kind: ethereum/contract
+    name: PrizePool
+    network: SomniaTestnet # Replace with your network
+    source:
+      abi: PrizePool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Raffle
+        - Player
+        - RaffleDeposit
+        - Withdrawal
+        - WinnerDrawnEvent
+        - DepositDeadlineUpdatedEvent
+        - DrawTimeUpdatedEvent
+        - DepositedToYieldProtocolEvent
+        - WithdrawnFromYieldProtocolEvent
+      abis:
+        - name: PrizePool
+          file: ../src/abi/PrizePool.json
+        - name: ERC20
+          file: ../src/abi/ERC20.json
+      eventHandlers:
+        - event: Deposited(indexed address,uint256)
+          handler: handleDeposited
+        - event: WinnerDrawn(indexed address)
+          handler: handleWinnerDrawn
+        - event: Claimed(indexed address,uint256)
+          handler: handleClaimed
+        - event: DepositDeadlineUpdated(uint256,uint256)
+          handler: handleDepositDeadlineUpdated
+        - event: DrawTimeUpdated(uint256,uint256)
+          handler: handleDrawTimeUpdated
+        # - event: DepositedToYieldProtocol(uint256)
+        #   handler: hhandleDepositedToYieldProtocol
+        # - event: WithdrawnFromYieldProtocol(uint256)
+        #   handler: handleWithdrawnFromYieldProtocol      
+      file: ./src/mapping.ts

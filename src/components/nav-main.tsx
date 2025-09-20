@@ -159,7 +159,7 @@ export function NavMain({
     <SidebarGroup>
       {sortedGroups.map((groupName, groupIndex) => (
         <React.Fragment key={groupName}>
-          <SidebarMenu className={cn("gap-2", groupIndex > 0 ? "" : "")}>
+          <SidebarMenu className={cn("gap-0", groupIndex > 0 ? "" : "")}>
             {groupedItems[groupName].map((item) => (
               <DropdownMenu key={item.title}>
                 <SidebarMenuItem>{renderMenuItem(item)}</SidebarMenuItem>

@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import ContextProvider from "./WalletContext";
 import { KuroProvider } from "./KuroContext";
 import { SocketProvider } from "./SocketContext";
+import { RaffleProvider } from "./RaffleContext";
 
 const AppContext = async ({
   children,
@@ -20,20 +21,20 @@ const AppContext = async ({
       <AuthProvider>
         <SocketProvider>
           <KuroProvider>
-            {children}
-            <ToastContainer
-              autoClose={5000}
-              position="bottom-right"
-              theme="dark"
-              stacked
-            />
-
-            <NextTopLoader
-              showSpinner={false}
-              height={3}
-              zIndex={1000}
-              color="#8371E9"
-            />
+              {children}
+              <ToastContainer
+                autoClose={5000}
+                position="bottom-right"
+                theme="dark"
+                stacked
+              />
+              <NextTopLoader
+                color="#fff"
+                crawl={true}
+                showSpinner={false}
+                height={5}
+                zIndex={1000}
+              />
           </KuroProvider>
         </SocketProvider>
       </AuthProvider>

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: process.env.NEXT_PUBLIC_API_HOST + "/:path*",
+        destination: "https://api.playsone.xyz/:path*",
       },
     ];
   },

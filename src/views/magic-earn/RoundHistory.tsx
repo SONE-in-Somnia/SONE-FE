@@ -3,6 +3,7 @@ import Card from "@/components/card";
 import { useKuro } from "@/context/KuroContext";
 import HistoryItem from "./HistoryItem";
 import { useAppKitAccount } from "@reown/appkit/react";
+import { Search } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { Round } from "@/types/round";
@@ -26,13 +27,30 @@ export const getTotalUserEntries = (round: Round, address: string): bigint => {
 };
 
 const RoundHistory = () => {
-  const { refetchHistories, allHistories, myWinHistories } = useKuro();
+  const { refetchHistories, allHistories, myWinHistories, isFetchingKuroHistory, isErrorKuroHistory } = useKuro();
   const { address } = useAppKitAccount();
   const [activeTab, setActiveTab] = useState<"all" | "youWin">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredHistories, setFilteredHistories] = useState<Round[] | undefined>(undefined);
 
   useEffect(() => {
     refetchHistories(1, 500, activeTab);
-  }, [address, activeTab]);
+  }, [activeTab, address]);
+
+  useEffect(() => {
+    setFilteredHistories(undefined);
+    setSearchQuery("");
+  }, [activeTab]);
+
+  const handleSearch = () => {
+    const historiesToFilter = activeTab === "all" ? allHistories?.data : myWinHistories?.data;
+    if (searchQuery === "") {
+        setFilteredHistories(undefined);
+        return;
+    }
+    const filtered = historiesToFilter?.filter(history => history.roundId.toString().includes(searchQuery));
+    setFilteredHistories(filtered);
+  };
 
   const titleComponent = (
     <div className="flex w-full items-center justify-between">
@@ -44,6 +62,26 @@ const RoundHistory = () => {
       </DialogClose>
     </div>
   );
+
+  const historiesToShow = filteredHistories ?? (activeTab === "all" ? allHistories?.data : myWinHistories?.data);
+
+  const renderContent = () => {
+    if (isFetchingKuroHistory) {
+      return <div className="text-center">Loading...</div>;
+    }
+
+    if (isErrorKuroHistory) {
+      return <div className="text-center text-red-500">Error loading history.</div>;
+    }
+
+    if (!historiesToShow || historiesToShow.length === 0) {
+      return <div className="text-center">No history found.</div>;
+    }
+
+    return historiesToShow.map((history, index) => (
+      <HistoryItem history={history} key={index} isWinner={activeTab === "youWin"} />
+    ));
+  };
 
   return (
     <div className="flex h-[600px] items-center justify-center">
@@ -73,16 +111,20 @@ const RoundHistory = () => {
                 </RetroButton>
               </div>
             </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search for Round..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="font-pixel-operator-mono bg-white border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-black border-t-black p-2 w-full focus:outline-none"
+              />
+              <RetroButton onClick={handleSearch}><Search className="h-5 w-5" /></RetroButton>
+            </div>
           </div>
-          <div className="mt-4 flex flex-col gap-4">
-            {activeTab === "all" &&
-              allHistories?.data.map((history, index) => (
-                <HistoryItem history={history} key={index} />
-              ))}
-            {activeTab === "youWin" &&
-              myWinHistories?.data.map((history, index) => (
-                <HistoryItem history={history} key={index} isWinner />
-              ))}
+          <div className="mt-4 flex flex-col gap-4 h-[calc(100%-4rem)] overflow-y-auto">
+            {renderContent()}
           </div>
         </div>
       </Window>

@@ -11,13 +11,7 @@ import {
   useCallback,
 } from "react";
 import { toast } from "react-toastify";
-import {
-  useSignMessage,
-  useBalance,
-  useReadContract,
-  usePublicClient,
-  useAccount,
-} from "wagmi";
+import { useSignMessage, useBalance, useReadContract, usePublicClient, useAccount } from "wagmi";
 import Cookies from "js-cookie";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { getCookie, setCookie, deleteCookie } from "@/utils/cookie";
@@ -48,6 +42,7 @@ type AuthContextType = {
   supportedTokens: SupportedTokenInfo[];
   getTokenSymbolByAddress: (tokenAddress: string) => string;
   updateSupportedTokens: () => Promise<void>;
+  isWalletVerified: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,6 +50,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { address, isConnected } = useAppKitAccount();
   const [isSyncMessage, setIsSyncMessage] = useState(false);
+  const [isWalletVerified, setIsWalletVerified] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('isWalletVerified') === 'true';
+    }
+    return false;
+  });
   const { signMessageAsync } = useSignMessage();
   const [user, setUser] = useState();
   const [nativeBalance, setNativeBalance] = useState<string>("0");
@@ -355,6 +356,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     Cookies.remove("refreshToken");
     setUser(undefined);
     setIsSyncMessage(false);
+    setIsWalletVerified(false)
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('isWalletVerified');
+    }
   };
 
   // Thêm hàm để lấy thông tin người dùng từ token
@@ -471,6 +476,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Delete referral cookie after successful processing
         deleteCookie("referral_code");
 
+        setIsWalletVerified(true);
+
         return "Wallet verified successfully";
       })(),
       {
@@ -505,8 +512,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [nativeBalanceData]);
 
+  // update sessionStorage
   useEffect(() => {
-    if (isConnected && !Cookies.get("accessToken")) {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('isWalletVerified', String(isWalletVerified));
+    }
+  }, [isWalletVerified]);
+
+  useEffect(() => {
+    if (isConnected && !Cookies.get("accessToken") && !isWalletVerified) {
       signMessageWithSign();
     } else if (isConnected && Cookies.get("accessToken")) {
       // Nếu đã có token nhưng chưa có thông tin người dùng, lấy thông tin người dùng
@@ -516,7 +530,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsSyncMessage(true);
       }
     }
-  }, [isConnected]);
+  }, [isConnected, isWalletVerified]);
 
   useEffect(() => {
     if (chainId) console.log(chainId == somniaTestnet.id);

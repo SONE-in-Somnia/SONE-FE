@@ -10,8 +10,8 @@ import { useRouter } from "next/navigation";
 const SpotlightGames = () => {
   const router = useRouter();
   const games = [
-    { name: "Wheely Wheely", image: "/images/spotlight-img.png", link: "/wheely-wheely" },
-    { name: "Game name", image: "/images/spotlight-img.png", link: "#" },
+    { name: "Wheely Wheely", image: "/images/wheel1.jpeg", link: "/wheely-wheely" },
+    { name: "Raffle on Sone", image: "/images/raffle.png", link: "/raffle" },
   ];
 
   const warningText = `🚨 WARNING: These games may drive you go crazy,
@@ -37,7 +37,13 @@ extreme addiction 🥵`;
               </div>
               <div className="h-1/4 flex items-center justify-between p-2">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="w-10 h-10 rounded-full bg-retro-gray"></div>
+                  <Image
+                    src={game.image}
+                    alt={game.name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                   <span className="font-bold">{game.name}</span>
                 </div>
                 <RetroButton onClick={() => router.push(game.link)}>Play</RetroButton>

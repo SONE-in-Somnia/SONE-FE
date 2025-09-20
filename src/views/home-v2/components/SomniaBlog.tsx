@@ -65,8 +65,8 @@ const SomniaBlog = () => {
               />
             </div>
             <div className="w-2/3">
-              <h3 className="font-bold">Somnia @Somnia_Network</h3>
-              <p className="text-sm">{currentTweet.text}</p>
+              <h3 className="font-bold pr-10">Somnia @Somnia_Network</h3>
+              <p className="text-sm pr-10">{currentTweet.text}</p>
             </div>
             <a href={tweetUrl} target="_blank" rel="noopener noreferrer" className="absolute top-0 right-0">
               <RetroButton className="w-8 h-8 p-2">
