@@ -73,6 +73,13 @@ const WheelyDepositPanel = () => {
       toast.error("Please switch to Somnia Testnet");
       return;
     }
+    if (!selectedToken) {
+      toast.error("Please select a token to deposit.");
+      return;
+    }
+    if (parseFloat(depositAmount) <= 0) {
+      toast.error("Deposit amount must be greater than zero.");
+    }
     if (selectedToken && parseFloat(depositAmount) < parseFloat(convertWeiToEther(selectedToken.minDeposit))) {
       toast.warning("Deposit amount can't be less than " + convertWeiToEther(selectedToken.minDeposit));
       return;

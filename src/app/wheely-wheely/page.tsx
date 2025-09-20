@@ -4,7 +4,6 @@ import WheelyDepositPanel from "@/views/wheely-wheely/components/WheelyDepositPa
 import RoundState from "@/views/magic-earn/RoundState";
 import PoolPlayers from "@/views/magic-earn/PoolPlayers";
 
-
 import React, { useState, useEffect } from "react";
 import Window from "@/views/home-v2/components/Window";
 import { useGetWheelyWheelyPlayers } from "@/api/wheely-wheely/useGetWheelyWheelyPlayers";
