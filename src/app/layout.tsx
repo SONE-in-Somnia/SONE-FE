@@ -59,6 +59,28 @@ export default function RootLayout({
   return (
     <html lang="en" className="overflow-x-hidden">
       <head>
+        <link
+          rel="preload"
+          href="/public/fonts/PixelOperator.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/public/fonts/PixelOperatorMono.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/public/fonts/PixelOperatorMono8-Bold.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{

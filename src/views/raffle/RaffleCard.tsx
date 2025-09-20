@@ -1,20 +1,19 @@
-// src/views/raffle/RaffleCard.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Window from '@/views/home-v2/components/Window';
-import { PoolType } from '@/types/raffle';
+import { PrizePool } from '@/types/raffle';
 import RaffleCardHeader from '@/components/raffle/RaffleCardHeader';
 import RaffleCardStats from '@/components/raffle/RaffleCardStats';
 import RaffleCardTVL from '@/components/raffle/RaffleCardTVL';
 import RaffleCardPrizeInfo from '@/components/raffle/RaffleCardPrizeInfo';
 import RaffleCardActions from '@/components/raffle/RaffleCardActions';
-import { formatEthereumAddress } from '@/utils/string'; // Import the formatting utility
+import { formatEthereumAddress } from '@/utils/string';
 import styles from '@/styles/WinnerInfo.module.css';
 
 // Define the component's props
 type RaffleCardProps = {
-  raffle: PoolType; 
+  raffle: PrizePool; 
   // Add optional props for detailed data
   showParticipateButton?: boolean;
   showExtraInfo?: boolean;

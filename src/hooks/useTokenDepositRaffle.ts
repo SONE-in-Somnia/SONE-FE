@@ -1,9 +1,10 @@
 import { parseEther } from "viem";
 import { toast } from "react-toastify";
-import { useWriteContract } from "wagmi";
+import { useWriteContract, useAccount } from "wagmi";
 import { NATIVE_TOKEN_ADDRESS } from "@/config/constants";
 import { useAuth } from "@/context/AuthContext";
 import { SupportedTokenInfo } from "@/types/round";
+import { useGetRaffleDetailsWithFallback } from "@/api/useGetRaffleDetailsWithFallback"  
 
 interface UseTokenDepositRaffleProps {
   contractAddress: `0x${string}`;
@@ -22,6 +23,9 @@ export const useTokenDepositRaffle = ({
 }: UseTokenDepositRaffleProps) => {
   const { writeContractAsync: depositToken, isPending: isDepositing } = useWriteContract();
   const { updateNativeBalance } = useAuth();
+  const { address } = useAccount();
+
+  const {refetch: refetchRaffleDetails} = useGetRaffleDetailsWithFallback(contractAddress, address)
 
   const handleDeposit = async () => {
     if (!selectedToken) {
@@ -38,7 +42,7 @@ export const useTokenDepositRaffle = ({
       toast.error("Please enter a valid amount");
       return;
     }
-
+    
     try {
       const value = parseEther(depositAmount);
 
@@ -46,7 +50,7 @@ export const useTokenDepositRaffle = ({
         abi: contractAbi,
         address: contractAddress,
         functionName: "deposit",
-        args: [],
+        args: [value],
         value: value,
       });
 
@@ -56,19 +60,18 @@ export const useTokenDepositRaffle = ({
         error: "Deposit failed. 🤯",
       }).then(async (txHash) => {
         await updateNativeBalance();
+        refetchRaffleDetails(); 
         if (onSuccess) {
           onSuccess(txHash);
         }
       });
     } catch (error) {
       console.error("Error depositing:", error);
-      // This will likely show the generic "Internal JSON-RPC error" again
       const errorMessage = (error as any)?.shortMessage || "Deposit failed";
       toast.error(errorMessage);
     }
   };
 
-  // Approval logic is not needed as we only handle native tokens
   const needsApproval = () => false;
   const handleApproval = async () => {};
 

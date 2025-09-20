@@ -13,6 +13,7 @@ import Window from "@/views/home-v2/components/Window";
 interface MissionData {
     mission: string;
     reward: string;
+    className?: string;
 }
 
 const MissionTable = () => {

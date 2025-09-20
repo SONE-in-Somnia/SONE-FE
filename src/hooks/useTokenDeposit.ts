@@ -132,11 +132,6 @@ export const useTokenDeposit = ({
         value: value,
       });
 
-    // --- DEBUG START ---
-      console.log("--- Preparing Deposit Transaction ---");
-      // console.log("Arguments for smart contract:", depositArgs);
-    // --- DEBUG END ---
-
 
       toast.promise(res, {
         pending: "Deposit processing..",

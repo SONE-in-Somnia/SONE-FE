@@ -1,7 +1,6 @@
 // src/views/raffle/WinnerInfo.tsx
 import React from 'react';
 import Window from '@/views/home-v2/components/Window';
-import { RaffleDetailsType } from '@/types/raffle'; // Import the type
 import RetroFrame from '@/components/ui/RetroFrame';
 import { formatEthereumAddress } from '@/utils/string';
 import { Address } from 'viem';

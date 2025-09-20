@@ -588,6 +588,10 @@ export class DepositCall__Inputs {
   constructor(call: DepositCall) {
     this._call = call;
   }
+
+  get amount(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
 }
 
 export class DepositCall__Outputs {

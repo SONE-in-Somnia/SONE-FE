@@ -3,7 +3,7 @@ import { Address, PublicClient, formatUnits, Abi } from "viem";
 import { usePublicClient } from "wagmi";
 import { prizePoolManager } from "@/contracts";
 import prizePoolAbi from "@/abi/PrizePool.json"; // This imports the entire JSON artifact
-import { PrizePool, PrizePoolList } from "@/types/raffle"; // Updated import
+import { PrizePool, PrizePoolList, RaffleStatus } from "@/types/raffle"; // Updated import
 
 export const useGetPoolsRPC = () => {
   const publicClient = usePublicClient();
@@ -27,7 +27,7 @@ export const useGetPoolsRPC = () => {
         // Fetch all pools data from PrizePoolManager
         const poolsData = await publicClient.readContract({
           address: prizePoolManager.address,
-          abi: prizePoolManager.abi.abi, // Changed to prizePoolManager.abi.abi
+          abi: prizePoolManager.abi.abi,
           functionName: "fetchPools",
         });
 
@@ -51,17 +51,17 @@ export const useGetPoolsRPC = () => {
         const poolDetailsContracts = typedPoolsData.flatMap((pool) => [
           {
             address: pool.prizePoolAddress,
-            abi: prizePoolAbi.abi as Abi, // Already prizePoolAbi.abi
+            abi: prizePoolAbi.abi as Abi,
             functionName: "totalDeposits",
           },
           {
             address: pool.prizePoolAddress,
-            abi: prizePoolAbi.abi as Abi, // Already prizePoolAbi.abi
+            abi: prizePoolAbi.abi as Abi,
             functionName: "count", // Assuming 'count' is participantCount
           },
           {
             address: pool.prizePoolAddress,
-            abi: prizePoolAbi.abi as Abi, // Already prizePoolAbi.abi
+            abi: prizePoolAbi.abi as Abi,
             functionName: "winner",
           },
         ]);
@@ -84,6 +84,20 @@ export const useGetPoolsRPC = () => {
           // Assuming depositToken has 18 decimals for formatting
           const decimals = 18;
 
+          // Calculate status
+          const now = Date.now() / 1000;
+          let status: RaffleStatus;
+
+          if (winnerAddress !== '0x0000000000000000000000000000000000000000') {
+            status = RaffleStatus.COMPLETED;
+          } else if (now < Number(pool.depositionDeadline)) {
+            status = RaffleStatus.IN_PROGRESS;
+          } else if (now < Number(pool.withdrawalTime)) {
+            status = RaffleStatus.DEPOSIT_CLOSED;
+          } else {
+            status = RaffleStatus.DRAW_CLOSED;
+          }
+
           return {
             name: pool.name,
             symbol: pool.symbol,
@@ -95,6 +109,7 @@ export const useGetPoolsRPC = () => {
             totalDeposits: formatUnits(totalDepositsBigInt, decimals),
             participantCount: Number(participantCountBigInt),
             winner: winnerAddress,
+            status: status, // Assign the calculated status
           };
         });
 

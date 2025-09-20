@@ -38,10 +38,16 @@ const data = {
       group: "main",
     },
     {
+      title: "WHEELY",
+      url: "/wheely-wheely",
+      iconName: "loader-pinwheel",
+      group: "games",
+    },
+    {
       title: "RAFFLE",
       url: "/raffle",
       iconName: "ticket",
-      group: "main",
+      group: "games",
     },
     {
       title: "REWARDS",
@@ -53,14 +59,8 @@ const data = {
       title: "LEADERBOARD",
       url: "/leaderboard",
       iconName: "trophy",
-      group: "games",
+      group: "main",
     },
-    // {
-    //   title: "MY PROFILE",
-    //   url: "/myprofile",
-    //   iconName: "rocket",
-    //   group: "social",
-    // },
   ],
 };
 

@@ -1,16 +1,16 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { convertWeiToEther } from "@/utils/string";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt, usePublicClient } from "wagmi";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Check, ChevronsDown } from "lucide-react";
+// import { Check, ChevronsDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
@@ -21,68 +21,88 @@ import Window from "@/views/home-v2/components/Window";
 import { useQueryClient } from "@tanstack/react-query";
 import { config } from "@/config";
 import RaffleUserDeposit from "./RaffleUserDeposit";
-import { useTokenDepositRaffle } from "@/hooks/useTokenDepositRaffle";
 import { useDepositInput } from "@/hooks/useDepositInput";
-import { useTokenSelectionRaffle } from "@/hooks/useTokenSelectionRaffle";
-import { useWithdrawal } from "@/hooks/useWithdrawal";
 import { NATIVE_TOKEN_ADDRESS } from "@/config/constants";
 import PrizePoolABI from "@/abi/PrizePool.json";
-import { YoloABIMultiToken } from "@/abi/YoloABI";
 import { useRaffle } from "@/context/RaffleContext";
 import { RaffleStatus } from "@/types/raffle";
-import { Address } from "viem";
+import { Address, parseEther, formatUnits } from "viem";
+import { PrizePoolData } from '@/types/raffle'
+import { ERC20ABI } from "@/abi/ERC20ABI";
 
-const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: { depositDeadline: number, prizePoolAddress: Address, userTotalDeposit: string }) => {
+
+const RaffleDeposit = ({ raffle }: { raffle: PrizePoolData }) => {
+  const { depositDeadline, prizePoolAddress, userDeposit } = raffle;
   const [depositTxHash, setDepositTxHash] = useState<`0x${string}` | undefined>();
   const [estimatedUsdValue, setEstimatedUsdValue] = useState<number | null>(null);
   const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
+  const [inputError, setInputError] = useState<string | null>(null);
+
 
   const { chainId } = useAccount();
   const { address, isConnected } = useAppKitAccount();
+  const publicClient = usePublicClient();
   const { supportedTokens, getTokenSymbolByAddress, updateSupportedTokens } = useAuth();
   const queryClient = useQueryClient();
+  const [allowance, setAllowance] = useState<bigint | null>(null);
+  const MOCK_STT_PRICE_USD = 0.10;
 
-  const { selectedRaffle } = useRaffle();
-
-  const { selectedToken, setSelectedToken } = useTokenSelectionRaffle(supportedTokens, isConnected, selectedRaffle?.tokenAddress);
-  const { depositAmount, setDepositAmount, inputError, handleInputChange } = useDepositInput(selectedToken);
-  const {
+  const { 
+    depositAmount,
+    setDepositAmount,
     handleDeposit,
-    handleApproval,
-    needsApproval,
     isDepositing,
-    isApproving,
-    unlimitedApproval,
-    setUnlimitedApproval,
-  } = useTokenDepositRaffle({
-    contractAddress: prizePoolAddress,
-    contractAbi: PrizePoolABI.abi,
-    selectedToken: selectedToken,
-    depositAmount: depositAmount,
-    onSuccess: (txHash) => {
-      setDepositTxHash(txHash as `0x${string}`);
-    },
-  });
-
-  const {
     handleWithdraw,
     isWithdrawing,
-    hasWithdrawn,
-    setHasWithdrawn,
-  } = useWithdrawal({ prizePoolAddress });
+    handleApprove,
+    isApproving,
+    checkAllowance,
+  } = useRaffle();
+  const { isSuccess: isDepositConfirmed, isError: isDepositError } = useWaitForTransactionReceipt({ hash: depositTxHash, });
+  const [userTokenBalance, setUserTokenBalance] = useState<bigint>(0n);
+  const [tokenDecimals, setTokenDecimals] = useState<number>(18);
+  const currencySymbol = raffle.symbol;
+  
+  // validate deposit input
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDepositAmount(value);
+    // basic validation
+    if (parseFloat(value) <= 0) {
+      setInputError('Amoutn must be greater than 0');
+    } else {
+      setInputError(null);
+    }
+  };
 
-  const MOCK_STT_PRICE_USD = 0.10;
+  // check allowance
   useEffect(() => {
-      if (!isConnected) {
-        setSelectedToken(null);
+    const getAllowance = async () => {
+      if (raffle && isConnected) {
+        const currentAllowance = await checkAllowance(raffle.prizePoolAddress);
+        setAllowance(currentAllowance);
       }
-    }, [isConnected, setSelectedToken]);
+    };
+    getAllowance();
+  }, [raffle, isConnected, checkAllowance]);
 
+  // check approval
+  const needsApproval = useMemo(() => {
+    if (!depositAmount || !allowance) return false;
+    const depositAmountWei = parseEther(depositAmount || "0");
+    return allowance < depositAmountWei;
+  }, [allowance, depositAmount]);
+  
+  // check deadlineDeposit
   useEffect(() => {
     const checkDeadline = () => {
       const now = Date.now() / 1000;
-      if (now > Number(depositDeadline)) {
+      const deadline = Number(depositDeadline);
+
+      if (now > deadline) {
         setIsDeadlinePassed(true);
+      } else {
+        setIsDeadlinePassed(false);
       }
     };
     checkDeadline();
@@ -90,19 +110,17 @@ const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: 
     return () => clearInterval(interval);
   }, [depositDeadline]);
 
+  // calculate est USD value
   useEffect(() => {
     const amount = parseFloat(depositAmount);
-    if (!isNaN(amount) && selectedToken?.symbol === 'STT') {
+    if (!isNaN(amount) && raffle.symbol === 'STT') {
       setEstimatedUsdValue(amount * MOCK_STT_PRICE_USD);
     } else {
       setEstimatedUsdValue(null);
     }
-  }, [depositAmount, selectedToken]);
+  }, [depositAmount, raffle.symbol]);
 
-  const { isSuccess: isDepositConfirmed, isError: isDepositError } = useWaitForTransactionReceipt({
-    hash: depositTxHash,
-  });
-
+  // check deposit's success
   useEffect(() => {
     if (isDepositConfirmed) {
       toast.success("Deposit confirmed!");
@@ -112,6 +130,7 @@ const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: 
     }
   }, [isDepositConfirmed, queryClient, address, updateSupportedTokens]);
 
+  // catch deposit error
   useEffect(() => {
     if (isDepositError) {
       toast.error("Deposit confirmation failed.");
@@ -119,42 +138,50 @@ const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: 
     }
   }, [isDepositError]);
 
-  const handleDepositWrapper = async () => {
-    // --- DEBUG START ---
-    console.log("--- Debugging Deposit ---");
-    console.log("Address:", address);
-    console.log("Chain ID:", chainId);
-    console.log("Required Chain ID:", somniaTestnet.id);
-    console.log("Selected Token:", selectedToken);
-    
-    // --- DEBUG END ---
+  // fetch the user's balance and the token's decimals
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      if (!publicClient || !address || !raffle?.token) {
+        setUserTokenBalance(0n);
+        setTokenDecimals(18);
+        return;
+      }
 
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-    if (chainId !== somniaTestnet.id) {
-      toast.error("Please switch to Somnia Testnet");
-      return;
-    }
-    if (selectedToken && parseFloat(depositAmount) < parseFloat(convertWeiToEther(selectedToken.minDeposit))) {
-      toast.warning("Deposit amount can't be less than " + convertWeiToEther(selectedToken.minDeposit));
-      return;
-    }
-    if (selectedToken && parseFloat(depositAmount) > parseFloat(convertWeiToEther(selectedToken.balance))) {
-      toast.warning("You don't have enough balance to deposit");
-      return;
-    }
-    handleDeposit();
-  };
+      try {
+        // fetch balance
+        const balance = await publicClient.readContract({
+          address: raffle.token,
+          abi: ERC20ABI,
+          functionName: 'balanceOf',
+          args: [address],
+        });
+        setUserTokenBalance(balance as bigint);
 
-  const currencySymbol = selectedToken ? getTokenSymbolByAddress(selectedToken.address) : "";
+        // Fetch decimals
+        const decimals = await publicClient.readContract({
+          address: raffle.token,
+          abi: ERC20ABI,
+          functionName: "decimals",
+        });
+        setTokenDecimals(decimals as number);
+      } catch (err) {
+        console.log("Failed to fetch token balance or decimals", err);
+        setUserTokenBalance(0n);
+        setTokenDecimals(18);
+      }
+    };
 
+    fetchTokenData();
+  }, [publicClient, address, raffle?.token]);
+
+  // calculate percentage based on user's balance
   const handlePercentageClick = (percentage: number) => {
-    if (selectedToken) {
-      const balance = parseFloat(convertWeiToEther(selectedToken.balance));
-      const amount = (balance * percentage) / 100;
+    if (userTokenBalance > 0n) {
+      const balanceInEther = parseFloat(formatUnits(userTokenBalance, tokenDecimals));
+      const amount = (balanceInEther * percentage) / 100;
       setDepositAmount(amount.toString());
+    } else {
+      toast.warning("You have no balance for this token.");
     }
   };
 
@@ -166,27 +193,7 @@ const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: 
         </div>
         <div>
           <div className="flex justify-center text-sm mb-4 tracking-tighter">
-            <RaffleUserDeposit userTotalDeposit={userTotalDeposit} symbol={currencySymbol} />
-            {selectedToken?.address !== NATIVE_TOKEN_ADDRESS && needsApproval() && (
-              <div className="flex items-center gap-3">
-                <Switch id="enable-feature" checked={unlimitedApproval} onCheckedChange={setUnlimitedApproval} />
-                <Label htmlFor="enable-feature">Unlimited Approval</Label>
-              </div>
-            )}
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={`flex items-center text-retro-black gap-2 border border-retro-gray-4 bg-retro-gray-3 px-2 py-1 text-xs transition-all pointer-events-none`}
-              >
-                <div className="flex flex-col gap-1 text-start font-medium">
-                  <span className="text-xs">
-                    Balance:{" "}
-                    {selectedToken
-                      ? `${convertWeiToEther(selectedToken.balance)} ${getTokenSymbolByAddress(selectedToken?.address)}`
-                      : 0}
-                  </span>
-                </div>
-              </DropdownMenuTrigger>
-            </DropdownMenu>
+            <RaffleUserDeposit userTotalDeposit={raffle.userDeposit} symbol={raffle.symbol} />
           </div>
         </div>
         <div className="flex-grow flex items-center gap-2">
@@ -209,6 +216,7 @@ const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: 
               key={percentage}
               onClick={() => handlePercentageClick(percentage)}
               className="w-full"
+              disabled={!isConnected || userTokenBalance === 0n}
             >
               {percentage}%
             </RetroButton>
@@ -217,50 +225,47 @@ const RaffleDeposit = ({ depositDeadline, prizePoolAddress, userTotalDeposit }: 
         <div className="flex items-center justify-between gap-3">
 
         </div>
-        {needsApproval() ? (
+        {needsApproval ? (
           <RetroButton
-            onClick={handleApproval}
+            onClick={() => handleApprove(raffle.prizePoolAddress)}
             type="button"
             className="w-full"
-            disabled={!depositAmount || isApproving || !!inputError}
+            disabled={!depositAmount || isApproving || !! inputError || !isConnected}
           >
-            {isApproving ? "APPROVING..." : "APPROVE"}
+            {isApproving ? "Approving..." : "Approve"}
           </RetroButton>
         ) : (
-          <> 
-            {selectedRaffle?.winner ? (
-              hasWithdrawn ? (
-                <RetroButton type="button" className="w-full" disabled>
-                  Entries Closed
-                </RetroButton>
-              ) : (
+              <>
+                {raffle.status === RaffleStatus.COMPLETED ? (
+                // If the raffle is fully completed (winner drawn)
                 <RetroButton
-                  onClick={handleWithdraw}
-                  type="button"
+                  onClick={() => handleWithdraw(raffle.prizePoolAddress)}
+                  type='button'
                   className="w-full"
-                  disabled={isWithdrawing || parseFloat(userTotalDeposit) === 0} // Changed here
+                  disabled={isWithdrawing || raffle.isUserWinner || !isConnected}
                 >
                   {isWithdrawing ? "WITHDRAWING..." : "Withdraw"}
                 </RetroButton>
-              )
-            ) : (
-              <RetroButton
-                onClick={handleDepositWrapper}
-                type="button"
-                className="w-full"
-                // disabled={
-                //   isDeadlinePassed ||
-                //   !depositAmount ||
-                //   isDepositing ||
-                //   !!inputError ||
-                //   (selectedRaffle?.status !== RaffleStatus.IN_PROGRESS)
-                // }
-              >
-                {isDeadlinePassed ? "Entries Closed" : "Deposit"}
-              </RetroButton>
+                ) : (
+                  // If the raffle is IN_PROGRESS
+                  <RetroButton
+                    onClick={() => handleDeposit(raffle.prizePoolAddress)}
+                    type="button"
+                    className="w-full"
+                    disabled={
+                      raffle.status !== RaffleStatus.IN_PROGRESS ||
+                      isDeadlinePassed ||
+                      !depositAmount ||
+                      isDepositing ||
+                      !!inputError ||
+                      !isConnected
+                    }
+                  >
+                    {isDeadlinePassed ? "Entries Closed" : "Deposit"}
+                  </RetroButton>
+                )}
+              </>
             )}
-          </>
-        )}
       </div>
     </Window>
   );

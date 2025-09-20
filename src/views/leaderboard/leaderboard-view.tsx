@@ -58,21 +58,7 @@ const LeaderboardView = () => {
                 <div className="mb-5 h-[120px] overflow-hidden">
                     <LeaderboardAnimation />
                 </div>
-                <div className="mb-5">
-                    {isConnected && signature ? (
-                        <UserProfileCard
-                            address={address || ""}
-                            rank={currentUserData?.rank ?? "N/A"}
-                            points={currentUserData?.total_deposit ?? 0}
-                        />
-                    ) : (
-                        <SignInPrompt
-                            signature={signature}
-                            onSignInSuccess={handleSignInSuccess}
-                            onDisconnect={handleDisconnect}
-                        />
-                    )}
-                </div>
+                
                 <div className="flex gap-5">
                     <div className="w-1/2">
                         <Window title="👑 RANKING 👑" className="bg-retro-yellow">
@@ -80,7 +66,22 @@ const LeaderboardView = () => {
                             {!leaderboardError && <LeaderboardTable data={formattedLeaderboardData} />}
                         </Window>
                     </div>
-                    <div className="w-1/2">
+                    <div className="w-1/2 h-fit">
+                        <div className="mb-5">
+                            {isConnected && signature ? (
+                                <UserProfileCard
+                                    address={address || ""}
+                                    rank={currentUserData?.rank ?? "N/A"}
+                                    points={currentUserData?.total_deposit ?? 0}
+                                />
+                            ) : (
+                                <SignInPrompt
+                                    signature={signature}
+                                    onSignInSuccess={handleSignInSuccess}
+                                    onDisconnect={handleDisconnect}
+                                />
+                            )}
+                        </div>
                         <MissionTable />
                     </div>
                 </div>

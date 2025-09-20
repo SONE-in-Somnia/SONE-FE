@@ -1,10 +1,11 @@
-// src/app/raffle/[prizePoolAddress]/page.tsx
+
 'use client';
 
-import React from 'react';
+import { useRaffle } from '@/context/RaffleContext';
+import { PrizePoolData } from '@/types/raffle';
+import React, { useEffect, useState } from 'react'; // Import useEffect
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useGetRaffleDetailsRPC } from '@/api/useGetRaffleDetailsRPC';
 import { useAccount } from 'wagmi';
 
 // Core components for the page
@@ -28,21 +29,21 @@ import RaffleCardSkeleton from '@/skeleton/RaffleCardSkeleton';
 const RaffleDetailPage = () => {
   const params = useParams();
   const prizePoolAddress = params?.prizePoolAddress as `0x${string}` | undefined;
+  const { getRaffleDetails, isLoadingDetails, error } = useRaffle();
+  const [raffle, setRaffle] = useState<PrizePoolData | null>(null);
   const { address } = useAccount();
 
-  const {
-    data: raffle,
-    isLoading,
-    error // Removed isError
-  } = useGetRaffleDetailsRPC(prizePoolAddress, address);
+  useEffect(() => {
+    if (prizePoolAddress) {
+      const fetchDetails = async () => {
+        const details = await getRaffleDetails(prizePoolAddress);
+        setRaffle(details);
+      };
+      fetchDetails();
+    }
+  }, [prizePoolAddress, getRaffleDetails]);
 
-  // --- DEBUG: Log the data from the hook ---
-  console.log('--- RaffleDetailPage Debug ---');
-  console.log('prizePoolAddress from URL:', prizePoolAddress);
-  console.log('isLoading:', isLoading);
-  console.log('error:', error);
-  console.log('Raw raffle data from useGetRaffleDetailsRPC:', raffle);
-  console.log('------------------------------');
+  const isLoading = isLoadingDetails[prizePoolAddress ?? ''] || !raffle;
 
   if (!prizePoolAddress) {
     return (
@@ -66,7 +67,6 @@ const RaffleDetailPage = () => {
         </BreadcrumbItem>
         <BreadcrumbSeparator className="text-white" />
         <BreadcrumbItem>
-          {/* Use prizePoolAddress directly here, as raffle.name is not available in PrizePoolData */}
           <BreadcrumbPage className="text-white font-extrabold">Raffle #{prizePoolAddress}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
@@ -88,13 +88,12 @@ const RaffleDetailPage = () => {
     );
   }
 
-  // Changed from isError || !raffle to error || !raffle
   if (error || !raffle) {
     return (
       <RetroPanel title="Raffle Details" headerContent={breadcrumb} className='flex justify-center bg-green-700 h-fit max-w-[100%] w-[100%]'>
         <div className="text-center text-retro-black py-16">
           <p className="text-2xl font-bold mb-2">Raffle not found!</p>
-          <p>Could not load details for raffle #{prizePoolAddress}.</p>
+          <p>{error?.message || `Could not load details for raffle ${prizePoolAddress}.`}</p>
         </div>
       </RetroPanel>
     );
@@ -111,7 +110,6 @@ const RaffleDetailPage = () => {
         </BreadcrumbItem>
         <BreadcrumbSeparator className="text-white" />
         <BreadcrumbItem>
-          {/* Use prizePoolAddress as name is not available in PrizePoolData */}
           <BreadcrumbPage className="text-white font-extrabold">{raffle.name}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
@@ -126,11 +124,11 @@ const RaffleDetailPage = () => {
           <RaffleDetailsCard raffle={raffle} />
         </div>
         <div className="space-y-6">
-          <RaffleDeposit
-            depositDeadline={raffle.depositDeadline}
-            prizePoolAddress={prizePoolAddress}
-            userTotalDeposit={raffle.userDeposit}
-          />
+          {raffle && (
+            <RaffleDeposit
+              raffle={raffle}
+            />
+          )}
         </div>
       </div>
       <div className="mt-2">
