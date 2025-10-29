@@ -21,6 +21,7 @@ export default {
         "retro-gray-2": "#E9E9E9",
         "retro-gray-3": "#D0D0D0",
         "retro-gray-4": "#ACACAC",
+        "retro-gray-5": "#D4D5D4",
         "retro-blue": "#000080",
         "retro-green": "#00FF00",
         "retro-orange": "#FFA500",

@@ -3,18 +3,18 @@ import React from "react";
 import TopBanner from "../views/home-v2/components/TopBanner";
 import SpotlightGames from "../views/home-v2/components/SpotlightGames";
 import NftPreview from "../views/home-v2/components/NftPreview";
-import SonesHub from "../views/home-v2/components/SonesHub";
 import SomniaBlog from "../views/home-v2/components/SomniaBlog";
-import TestnetFaucet from "../views/home-v2/components/TestnetFaucet";
 import FloatingEmojis from "../components/FloatingEmojis";
+import Activities from "../views/home-v2/components/Activities";
+import Leaderboard from "../views/home-v2/components/Leaderboard";
 
 
 const HomeV2Page = () => {
   return (
-    <>
+    <div className="relative min-h-screen flex flex-col">
       <MatrixRain />
       <FloatingEmojis />
-      <div className="grid grid-cols-12 grid-rows-12 h-[1024px] overflow-hidden gap-3">
+      <div className="flex-grow grid grid-cols-12 grid-rows-12 h-[1024px] overflow-hidden gap-3">
 
         {/* Top Banner */}
         <div className="col-span-12 row-span-2">
@@ -31,22 +31,22 @@ const HomeV2Page = () => {
           <NftPreview />
         </div>
 
-        {/* SONE's HUB */}
-        <div className="col-span-8 row-span-4">
-          <SonesHub />
+        {/* Activities */}
+        <div className="col-span-4 row-span-4">
+          <Activities />
         </div>
 
-        {/* Blog and Faucet */}
-        <div className="col-span-4 row-span-4 grid grid-rows-3 gap-4">
-          <div className="row-span-3">
-              <SomniaBlog />
-          </div>
-          <div className="row-span-1">
-              <TestnetFaucet />
-          </div>
+        {/* Somnia News */}
+        <div className="col-span-4 row-span-4">
+          <SomniaBlog />
+        </div>
+
+        {/* Leaderboard */}
+        <div className="col-span-4 row-span-4">
+          <Leaderboard />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -31,7 +31,7 @@ const Window: React.FC<WindowProps> = ({
     >
       <div
         className={cn(
-          "flex flex-shrink-0 items-center justify-between bg-retro-blue p-1 text-white",
+          "flex flex-shrink-0 items-center justify-between bg-gradient-to-r from-[#9C4FBE] to-[#89C1D6] p-1 text-white",
           headerClassName,
         )}
       >

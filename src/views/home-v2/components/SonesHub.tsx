@@ -15,16 +15,6 @@ const SonesHub = () => {
     isError,
   } = useGetLeaderboard();
 
-  const activities: string[] = [];
-  // Mock activities data
-  // const activities = [
-  //   "User1 deposited 100 STT",
-  //   "User2 won 50 STT in Wheely Wheely",
-  //   "User3 deposited 200 STT",
-  //   "User4 won 100 STT in Wheely Wheely",
-  //   "User5 deposited 50 STT",
-  // ];
-
   const formattedLeaderboardData = leaderboard.map((player, index) => ({
     rank: index + 1,
     address: player.address,
@@ -33,7 +23,7 @@ const SonesHub = () => {
 
   return (
     <Window title="🎮 SONE'S HUB ⚔">
-      <div className="grid grid-cols-4 gap-4 h-full">
+      <div className="grid grid-cols-3 gap-4 h-full">
         {/* Column 1: Featured Games */}
         <div className="col-span-1 flex flex-col gap-4">
           <div className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-3 flex flex-col items-center justify-center text-center">
@@ -59,37 +49,7 @@ const SonesHub = () => {
           </div>
         </div>
 
-        {/* Column 2: Live Activity Feed */}
-        <div className="col-span-1">
-          {isLoading && <p>Loading activities...</p>}
-          {isError && <p className="text-red-500">Failed to load activities</p>}
-          {!isLoading &&
-            !isError &&
-            activities.map((activity, index) => {
-              const parts = activity.split(/(\d+\.?\d*)/g);
-              return (
-                <div
-                  key={index}
-                  className="bg-retro-gray border-2 border-r-retro-gray-3 border-b-retro-gray-3 border-l-white border-t-white p-1 mb-3 flex justify-between ring-4 ring-retro-black/20"
-                >
-                  <span>
-                    {parts.map((part, i) =>
-                      /(\d+\.?\d*)/.test(part) ? (
-                        <span key={i} className="font-bold">
-                          {part}
-                        </span>
-                      ) : (
-                        part
-                      )
-                    )}
-                  </span>
-                  <span className="text-gray-500">now</span>
-                </div>
-              );
-            })}
-        </div>
-
-        {/* Column 3: Leaderboard & CTA */}
+        {/* Column 2: Leaderboard & CTA */}
         <div
           className={`${styles.warningEffect} col-span-2 p-3 text-white flex flex-col items-center justify-between text-center h-full`}
         >

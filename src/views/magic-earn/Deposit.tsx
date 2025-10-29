@@ -31,22 +31,19 @@ import { Divider } from "@mui/material";
 import Button from "@/components/button";
 
 const Deposit = () => {
+  // State defining
   const [depositAmount, setDepositAmount] = useState<string>("0.1");
 
-  const { writeContractAsync: depositToken, isPending: isDepositing } =
-    useWriteContract();
-  const { writeContractAsync: approveToken, isPending: isApproving } =
-    useWriteContract();
+  const { writeContractAsync: depositToken, isPending: isDepositing } = useWriteContract();
+  const { writeContractAsync: approveToken, isPending: isApproving } = useWriteContract();
   const { writeContractAsync: setNativeToken } = useWriteContract();
   const { chainId } = useAccount();
 
   const { poolStatus, kuroData } = useKuro();
   const { address } = useAppKitAccount();
-  const { supportedTokens, getTokenSymbolByAddress, updateSupportedTokens } =
-    useAuth();
+  const { supportedTokens, getTokenSymbolByAddress, updateSupportedTokens } = useAuth();
 
-  const [selectedToken, setSelectedToken] =
-    useState<SupportedTokenInfo | null>();
+  const [selectedToken, setSelectedToken] = useState<SupportedTokenInfo | null>();
   const [unlimitedApproval, setUnlimitedApproval] = useState(false);
   const [isLoadingApproval, setIsLoadingApproval] = useState(false);
   const { updateNativeBalance } = useAuth();
@@ -65,8 +62,7 @@ const Deposit = () => {
     try {
       await setNativeToken({
         abi: YoloABIMultiToken,
-        address: process.env
-          .NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS as `0x${string}`,
+        address: process.env.NEXT_PUBLIC_KURO_MULTI_TOKEN_ADDRESS as `0x${string}`,
         functionName: "setNativeTokenConfig",
         args: [true, parseUnits("0.01", 18), BigInt(10000)],
       });

@@ -6,16 +6,13 @@ import AppContext from "@/context/AppContext";
 import { Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
 import "react-toastify/dist/ReactToastify.css";
 
-import HeaderMobile from "@/views/share/HeaderMobile";
 import Notifier from "@/components/customized/notifier";
 import { ToastContainer } from "react-toastify";
 import GhostCursorWrapper from "@/components/customized/GhostCursorWrapper";
 import BayerDitheringBackground from "@/components/BayerDitheringBackground";
+import Footer from "@/views/home-v2/components/Footer";
 
 
 export const metadata: Metadata = {
@@ -108,28 +105,23 @@ export default function RootLayout({
           ></iframe>
         </noscript>
         <AppContext>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <HeaderMobile />
-              <div className="relative mx-auto flex w-full flex-1 flex-col gap-4 font-pixel-operator">
-                <Notifier />
-                <ToastContainer
-                  position="top-right"
-                  autoClose={5000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick
-                  rtl={false}
-                  pauseOnFocusLoss
-                  draggable
-                  pauseOnHover
-                  theme="dark"
-                />
-                <div className="p-4">{children}</div>
-              </div>
-            </SidebarInset>
-          </SidebarProvider>
+          <div className="relative mx-auto flex w-full flex-1 flex-col gap-4 font-pixel-operator">
+            <Notifier />
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+            />
+            <div className="p-4">{children}</div>
+          </div>
+          <Footer className="fixed bottom-0 left-0 w-full z-50" />
         </AppContext>
       </body>
     </html>
