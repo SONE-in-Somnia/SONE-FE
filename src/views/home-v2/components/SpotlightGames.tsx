@@ -6,6 +6,8 @@ import Image from "next/image";
 import { RetroButton } from "@/components/RetroButton";
 import styles from "../../../styles/SpotlightGames.module.css";
 import { useRouter } from "next/navigation";
+import { FaceIcon, ImageIcon, SunIcon } from "@radix-ui/react-icons";
+
 
 const SpotlightGames = () => {
   const router = useRouter();
@@ -173,7 +175,7 @@ const SpotlightGames = () => {
         </div>
         <div className="bg-[url(/images/trans-bg.jpg)] bg-repeat bg-[length:350px_350px] flex items-center justify-between gap-3 mt-5">
           <RetroButton className="" onClick={() => scroll(-200)}>
-            {"<"}
+            <svg width="32" height="32" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 4L9 11L4.5 7.5L9 4Z" fill="currentColor"></path></svg>
           </RetroButton>
 
           {/* Custom Scrollbar Track */}
@@ -200,7 +202,7 @@ const SpotlightGames = () => {
           </div>
 
           <RetroButton className="" onClick={() => scroll(200)}>
-            {">"}
+            <svg width="32" height="32" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 11L6 4L10.5 7.5L6 11Z" fill="currentColor"></path></svg>
           </RetroButton>
         </div>
       </div>
