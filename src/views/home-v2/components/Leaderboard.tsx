@@ -20,8 +20,8 @@ const Leaderboard = () => {
 
   return (
     <Window title="🏆 LEADERBOARD 🏆">
-      {isLoading && <p>Loading leaderboard...</p>}
-      {isError && <p className="text-red-500">Failed to load leaderboard.</p>}
+      {isLoading && <p className="text-gray-500 flex items-center justify-center h-full">Loading leaderboard...</p>}
+      {isError && <p className="text-red-500 flex items-center justify-center h-full">Failed to load leaderboard</p>}
       {!isLoading && !isError && <LeaderboardTable data={formattedLeaderboardData} />}
     </Window>
   );

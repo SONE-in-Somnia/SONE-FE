@@ -8,7 +8,6 @@ import styles from "../../../styles/SpotlightGames.module.css";
 import { useRouter } from "next/navigation";
 import { FaceIcon, ImageIcon, SunIcon } from "@radix-ui/react-icons";
 
-
 const SpotlightGames = () => {
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -24,14 +23,18 @@ const SpotlightGames = () => {
         setTrackWidth(trackRef.current.clientWidth);
       }
     };
-    
+
     updateTrackWidth();
-    window.addEventListener('resize', updateTrackWidth);
-    return () => window.removeEventListener('resize', updateTrackWidth);
+    window.addEventListener("resize", updateTrackWidth);
+    return () => window.removeEventListener("resize", updateTrackWidth);
   }, []);
 
   const games = [
-    { name: "Wheely Wheely", image: "/images/wheel1.jpeg", link: "/wheely-wheely" },
+    {
+      name: "Wheely Wheely",
+      image: "/images/wheel1.jpeg",
+      link: "/wheely-wheely",
+    },
     { name: "Raffle on Sone", image: "/images/raffle.png", link: "/raffle" },
     { name: "Jackpot", image: "/images/wheel3.jpeg", link: "#" }, // Added a third game for visual
     { name: "Coin Flip", image: "/images/raffle.png", link: "#" }, // Added a fourth game for visual
@@ -100,21 +103,22 @@ const SpotlightGames = () => {
     if (!scrollContainerRef.current) return;
 
     switch (e.key) {
-      case 'ArrowLeft':
+      case "ArrowLeft":
         e.preventDefault();
         scrollContainerRef.current.scrollLeft -= 200;
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         e.preventDefault();
         scrollContainerRef.current.scrollLeft += 200;
         break;
-      case 'Home':
+      case "Home":
         e.preventDefault();
         scrollContainerRef.current.scrollLeft = 0;
         break;
-      case 'End':
+      case "End":
         e.preventDefault();
-        scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+        scrollContainerRef.current.scrollLeft =
+          scrollContainerRef.current.scrollWidth;
         break;
     }
   };
@@ -137,16 +141,16 @@ const SpotlightGames = () => {
 
   return (
     <Window title="🎮 SPOTLIGHT GAMES ⚔">
-      <div className="h-full flex flex-col justify-center">
+      <div className="flex h-full flex-col justify-center">
         <div
           ref={scrollContainerRef}
-          className="flex overflow-hidden space-x-4 focus:outline-none"
+          className="flex space-x-4 overflow-hidden focus:outline-none"
           tabIndex={0}
         >
           {games.map((game, index) => (
             <div
               key={index}
-              className="flex-shrink-0 w-1/2 bg-retro-gray-2 ring-4 ring-retro-gray-1 h-[300px] flex flex-col"
+              className="flex h-[300px] w-1/2 flex-shrink-0 flex-col bg-retro-gray-2 ring-4 ring-retro-gray-1"
             >
               <div className="h-3/4">
                 <Image
@@ -154,55 +158,74 @@ const SpotlightGames = () => {
                   alt={game.name}
                   width={319}
                   height={203}
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                 />
               </div>
-              <div className="h-1/4 flex items-center justify-between p-2">
+              <div className="flex h-1/4 items-center justify-between p-2">
                 <div className="flex items-center justify-between gap-2">
                   <Image
                     src={game.image}
                     alt={game.name}
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="h-10 w-10 rounded-full object-cover"
                   />
                   <span className="font-bold">{game.name}</span>
                 </div>
-                <RetroButton onClick={() => router.push(game.link)}>Play</RetroButton>
+                <RetroButton onClick={() => router.push(game.link)}>
+                  Play
+                </RetroButton>
               </div>
             </div>
           ))}
         </div>
-        <div className="bg-[url(/images/trans-bg.jpg)] bg-repeat bg-[length:350px_350px] flex items-center justify-between gap-3 mt-5">
-          <RetroButton className="" onClick={() => scroll(-200)}>
-            <svg width="32" height="32" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 4L9 11L4.5 7.5L9 4Z" fill="currentColor"></path></svg>
+        <div className="mt-5 flex items-center justify-between gap-3 bg-[url(/images/trans-bg.jpg)] bg-[length:350px_350px] bg-repeat">
+          <RetroButton className="h-10 w-10 p-0" onClick={() => scroll(-200)}>
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M9 4L9 11L4.5 7.5L9 4Z" fill="currentColor"></path>
+            </svg>
           </RetroButton>
 
           {/* Custom Scrollbar Track */}
-          <div ref={trackRef} className="flex-1 relative h-10 cursor-pointer">
+          <div ref={trackRef} className="relative h-10 flex-1 cursor-pointer">
             {/* Scrollbar Thumb */}
             <div
               style={{
                 width: `${Math.max(10, 100 / games.length)}%`,
                 transform: (() => {
-                  if (trackWidth === 0) return 'translateX(0)';
-                  
+                  if (trackWidth === 0) return "translateX(0)";
+
                   const thumbWidthPercent = Math.max(10, 100 / games.length);
                   const thumbWidthPx = (thumbWidthPercent / 100) * trackWidth;
                   const maxTranslatePx = trackWidth - thumbWidthPx;
                   const translateXPx = scrollProgress * maxTranslatePx;
-                  
+
                   return `translateX(${translateXPx}px)`;
                 })(),
               }}
-              className={`absolute h-full bg-retro-gray border-4 border-r-black border-b-black border-t-white transition-opacity ${isDragging ? "opacity-100" : "opacity-90 hover:opacity-100"
-                }`}
+              className={`absolute h-full border-4 border-b-black border-r-black border-t-white bg-retro-gray transition-opacity ${
+                isDragging ? "opacity-100" : "opacity-90 hover:opacity-100"
+              }`}
               onMouseDown={handleThumbDrag}
             />
           </div>
 
-          <RetroButton className="" onClick={() => scroll(200)}>
-            <svg width="32" height="32" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 11L6 4L10.5 7.5L6 11Z" fill="currentColor"></path></svg>
+          <RetroButton className="h-10 w-10 p-0" onClick={() => scroll(200)}>
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M6 11L6 4L10.5 7.5L6 11Z" fill="currentColor"></path>
+            </svg>
           </RetroButton>
         </div>
       </div>

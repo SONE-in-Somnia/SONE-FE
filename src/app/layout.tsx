@@ -14,7 +14,6 @@ import GhostCursorWrapper from "@/components/customized/GhostCursorWrapper";
 import BayerDitheringBackground from "@/components/BayerDitheringBackground";
 import Footer from "@/views/home-v2/components/Footer";
 
-
 export const metadata: Metadata = {
   title: "SONE",
   description:
@@ -46,7 +45,6 @@ const pixelOperatorMonoBold = localFont({
   src: "../../public/fonts/PixelOperatorMono8-Bold.ttf",
   variable: "--font-pixel-operator-mono-bold",
 });
-
 
 export default function RootLayout({
   children,
@@ -119,9 +117,9 @@ export default function RootLayout({
               pauseOnHover
               theme="dark"
             />
-            <div className="p-4">{children}</div>
+            <div className="p-4 pb-24">{children}</div>
           </div>
-          <Footer className="fixed bottom-0 left-0 w-full z-50" />
+          <Footer className="fixed bottom-0 left-0 z-50 w-full" />
         </AppContext>
       </body>
     </html>
